@@ -4,11 +4,7 @@ import Card from "./components/Card";
 import Link from "next/link";
 import blueyBingo from "@/public/images/memory-game/bluey-bingo-family.avif";
 import bear from "@/public/images/critters/bear.png";
-import globe from "@/public/globe.svg";
-import window from "@/public/window.svg";
-import file from "@/public/file.svg";
-import nextIcon from "@/public/next.svg";
-import vercel from "@/public/vercel.svg";
+import frogCharacter from "@/public/images/frog-jump/frog.png";
 import { classNames } from "./utils/appearance";
 
 const games = [
@@ -27,46 +23,11 @@ const games = [
     bg: "bg-blue-200",
   },
   {
-    name: "World Explorer",
-    image: globe,
-    link: "#",
+    name: "Frog Jump",
+    image: frogCharacter,
+    link: "frog-jump",
     alt: "World Explorer Game",
     bg: "bg-green-200",
-  },
-  {
-    name: "Window Game",
-    image: window,
-    link: "#",
-    alt: "Window Game",
-    bg: "bg-yellow-200",
-  },
-  {
-    name: "File Fun",
-    image: file,
-    link: "#",
-    alt: "File Fun Game",
-    bg: "bg-purple-200",
-  },
-  {
-    name: "Next Up",
-    image: nextIcon,
-    link: "#",
-    alt: "Next Up Game",
-    bg: "bg-orange-200",
-  },
-  {
-    name: "Vercel Race",
-    image: vercel,
-    link: "#",
-    alt: "Vercel Race Game",
-    bg: "bg-teal-200",
-  },
-  {
-    name: "Vercel Race",
-    image: vercel,
-    link: "#",
-    alt: "Vercel Race Game",
-    bg: "bg-teal-400",
   },
 ];
 
