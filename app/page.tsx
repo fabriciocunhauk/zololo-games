@@ -5,6 +5,7 @@ import Link from "next/link";
 import blueyBingo from "@/public/images/memory-game/bluey-bingo-family.avif";
 import bear from "@/public/images/critters/bear.png";
 import frogCharacter from "@/public/images/frog-jump/frog.png";
+import bubbles from "@/public/images/bubble-pop/bubbles.png";
 import { classNames } from "./utils/appearance";
 
 const games = [
@@ -26,6 +27,13 @@ const games = [
     name: "Frog Jump",
     image: frogCharacter,
     link: "frog-jump",
+    alt: "World Explorer Game",
+    bg: "bg-green-200",
+  },
+  {
+    name: "Bubble Pop",
+    image: bubbles,
+    link: "bubble-pop",
     alt: "World Explorer Game",
     bg: "bg-green-200",
   },
