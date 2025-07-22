@@ -3,7 +3,7 @@ import Container from "./components/Container";
 import Card from "./components/Card";
 import Link from "next/link";
 import blueyBingo from "@/public/images/memory-game/bluey-bingo-family.avif";
-import bingo from "@/public/images/memory-game/bingo.png";
+import bear from "@/public/images/critters/bear.png";
 import globe from "@/public/globe.svg";
 import window from "@/public/window.svg";
 import file from "@/public/file.svg";
@@ -20,9 +20,9 @@ const games = [
     bg: "bg-pink-primary",
   },
   {
-    name: "Bingo",
-    image: bingo,
-    link: "#",
+    name: "Count the Critters",
+    image: bear,
+    link: "count-the-critters",
     alt: "Bingo Game",
     bg: "bg-blue-200",
   },
@@ -60,6 +60,13 @@ const games = [
     link: "#",
     alt: "Vercel Race Game",
     bg: "bg-teal-200",
+  },
+  {
+    name: "Vercel Race",
+    image: vercel,
+    link: "#",
+    alt: "Vercel Race Game",
+    bg: "bg-teal-400",
   },
 ];
 
