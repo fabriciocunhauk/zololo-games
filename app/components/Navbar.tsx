@@ -143,29 +143,27 @@ const Navbar: React.FC<NavbarProps> = ({ classes }) => {
   // const scrollPosition = useScrollPosition();
 
   return (
-    <div className="fixed top-0 w-full">
-      <nav
-        className={classNames(
-          "flex items-center justify-between bg-pink-primary p-4",
-          classes?.container
-        )}
-      >
-        <Link href="/" className="w-40 lg:w-52 mix-blend-multiply">
-          <Image
-            src={logo.src}
-            width={logo.width}
-            height={logo.height}
-            alt="Logo"
-          />
-        </Link>
-
-        <Navigation
-          navigation={mockNavigation}
-          subNavigation={mockSubNavigation}
+    <nav
+      className={classNames(
+        "flex items-center justify-between bg-pink-primary p-4 fixed top-0 w-full z-20",
+        classes?.container
+      )}
+    >
+      <Link href="/" className="w-40 lg:w-52 mix-blend-multiply">
+        <Image
+          src={logo.src}
+          width={logo.width}
+          height={logo.height}
+          alt="Logo"
         />
-        <MobileMenu navigation={mockNavigation} />
-      </nav>
-    </div>
+      </Link>
+
+      <Navigation
+        navigation={mockNavigation}
+        subNavigation={mockSubNavigation}
+      />
+      <MobileMenu navigation={mockNavigation} />
+    </nav>
   );
 };
 
