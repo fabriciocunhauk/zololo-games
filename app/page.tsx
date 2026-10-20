@@ -1,92 +1,32 @@
-import Image from "next/image";
 import Container from "./components/Container";
-import Card from "./components/Card";
-import Link from "next/link";
-import blueyBingo from "@/public/images/memory-game/bluey-bingo-family.avif";
-import bear from "@/public/images/critters/bear.png";
-import frogCharacter from "@/public/images/frog-jump/frog.png";
-import bubbles from "@/public/images/bubble-pop/bubbles.png";
-import { classNames } from "./utils/appearance";
-
-const games = [
-  {
-    name: "Memory Cards",
-    image: blueyBingo,
-    link: "/memory-game",
-    alt: "Memory Cards Game",
-    bg: "bg-pink-primary",
-  },
-  {
-    name: "Count the Critters",
-    image: bear,
-    link: "count-the-critters",
-    alt: "Bingo Game",
-    bg: "bg-blue-200",
-  },
-  {
-    name: "Frog Jump",
-    image: frogCharacter,
-    link: "frog-jump",
-    alt: "World Explorer Game",
-    bg: "bg-green-200",
-  },
-  {
-    name: "Bubble Pop",
-    image: bubbles,
-    link: "bubble-pop",
-    alt: "World Explorer Game",
-    bg: "bg-green-200",
-  },
-];
-
-type Game = (typeof games)[number];
-
-function GameCard({ game, idx }: { game: Game; idx: number }) {
-  return (
-    <Card
-      key={game.name}
-      classes={{
-        card: classNames(
-          "w-50 h-50 xl:w-60 xl:h-64 flex flex-col items-center justify-center cursor-pointer hover:scale-105 hover:ring-4 hover:ring-pink-primary/40 transition-transform duration-200 shadow-xl border-4 border-pink-primary",
-          game.bg,
-          idx % 2 === 0 ? "rotate-1" : "-rotate-1"
-        ),
-      }}
-    >
-      <Link
-        href={game.link}
-        className="flex flex-col items-center w-full h-full focus:outline-pink-primary"
-      >
-        <div className="flex-1 flex items-center justify-center w-full">
-          <Image
-            src={game.image}
-            alt={game.alt}
-            className="object-contain w-full h-full max-h-28 drop-shadow-md"
-            priority={idx === 0}
-          />
-        </div>
-        <div className="mt-4 text-center w-full">
-          <span className="block text-lg font-bold text-gray-800 drop-shadow-sm">
-            {game.name}
-          </span>
-        </div>
-      </Link>
-    </Card>
-  );
-}
+import GameCard from "./components/GameCard";
+import { GAMES } from "./constants/games";
 
 export default function Home() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen py-32 sm:py-0 bg-pink-secondary">
-      <Container
-        classes={{
-          container:
-            "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8",
-        }}
-      >
-        {games.map((game, idx) => (
-          <GameCard key={game.name} game={game} idx={idx} />
-        ))}
+    <main className="flex-1 pt-28 pb-20 sm:pt-36">
+      <Container classes={{ container: "flex flex-col gap-12 px-4 sm:px-10" }}>
+        <header className="max-w-3xl">
+          <h1 className="font-display text-[clamp(2.5rem,7vw,5rem)] leading-[0.95] text-balance">
+            Tap a game to play.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg sm:text-xl text-ink/80">
+            Short counting, adding and memory games for ages 4–8. Free to play,
+            nothing to sign up for.
+          </p>
+        </header>
+
+        <ul className="grid grid-cols-1 gap-x-6 gap-y-10 min-[420px]:grid-cols-2 lg:grid-cols-4">
+          {GAMES.map((game, idx) => (
+            <li key={game.href}>
+              <GameCard
+                game={game}
+                tilt={idx % 2 === 0 ? "left" : "right"}
+                priority={idx === 0}
+              />
+            </li>
+          ))}
+        </ul>
       </Container>
     </main>
   );

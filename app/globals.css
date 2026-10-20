@@ -1,8 +1,55 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gray-dark: #2e2e2e;
-  --color-gray-light: #d2d3d4;
+  --color-ink: #2b1b3d;
+  --color-paper: #f4eefb;
   --color-pink-primary: #e69db8;
-  --color-pink-secondary: #f1e7e7;
+  --color-sun: #ffc94d;
+  --color-leaf: #7cc47f;
+  --color-sky: #8cc8f0;
+}
+
+/* next/font sets these variables on <html>; inline so utilities read them directly. */
+@theme inline {
+  --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bagel), ui-rounded, system-ui, sans-serif;
+}
+
+@layer components {
+  /* Chunky toy-block tile. Set --tile to the block colour. */
+  .toy-block {
+    --tile: var(--color-pink-primary);
+    --edge: color-mix(in oklab, var(--tile) 55%, var(--color-ink));
+    background: var(--tile);
+    border: 3px solid var(--color-ink);
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 0 var(--edge);
+    transition:
+      transform 120ms ease-out,
+      box-shadow 120ms ease-out;
+  }
+
+  .toy-block:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 13px 0 var(--edge);
+  }
+
+  .toy-block:active {
+    transform: translateY(8px);
+    box-shadow: 0 2px 0 var(--edge);
+  }
+
+  .toy-block:focus-visible {
+    outline: 4px solid var(--color-ink);
+    outline-offset: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toy-block,
+    .toy-block:hover,
+    .toy-block:active {
+      transform: none;
+      transition: none;
+    }
+  }
 }

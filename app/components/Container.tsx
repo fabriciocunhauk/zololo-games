@@ -1,9 +1,8 @@
 import { classNames } from "@/app/utils/appearance";
-import { ReactNode, type JSX } from "react";
+import { ReactNode } from "react";
 
 interface ContainerProps {
   children: ReactNode;
-  element?: keyof JSX.IntrinsicElements;
   classes?: { container?: string };
   size?: "xs" | "sm" | "md" | "lg";
 }
@@ -17,7 +16,6 @@ const sizeMap: Record<NonNullable<ContainerProps["size"]>, string> = {
 
 const Container: React.FC<ContainerProps> = ({
   children,
-  element: Tag = "div",
   classes,
   size = "lg",
 }) => {
@@ -27,7 +25,7 @@ const Container: React.FC<ContainerProps> = ({
     classes?.container
   );
 
-  return <Tag className={className}>{children}</Tag>;
+  return <div className={className}>{children}</div>;
 };
 
 export default Container;
