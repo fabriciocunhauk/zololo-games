@@ -3,13 +3,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { classNames } from "@/app/utils/appearance";
 
 export type Feedback = {
-  tone: "success" | "error";
+  tone: "success" | "error" | "info";
   text: string;
 };
 
 const toneClasses: Record<Feedback["tone"], string> = {
   success: "bg-green-200 text-green-800 border-green-400",
   error: "bg-red-200 text-red-800 border-red-400",
+  info: "bg-sky/40 text-ink border-sky",
 };
 
 export default function FeedbackMessage({

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 const games = [
   { name: "Memory Cards", path: "/memory-game" },
-  { name: "Count the Critters", path: "/count-the-critters" },
+  { name: "Count the Animals", path: "/count-the-animals" },
   { name: "Frog Jump", path: "/frog-jump" },
   { name: "Bubble Pop", path: "/bubble-pop" },
 ];

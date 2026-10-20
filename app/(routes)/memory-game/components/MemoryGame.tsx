@@ -1,14 +1,27 @@
 "use client";
 import Container from "@/app/components/Container";
+import GameIntro from "@/app/components/GameIntro";
+import HowToPlay from "@/app/components/HowToPlay";
+import { MEMORY_HOW_TO_PLAY } from "../constants/howToPlay";
 import { useMemoryGame } from "../hooks/useMemoryGame";
 import GameHeader from "./GameHeader";
-import IntroScreen from "./IntroScreen";
 import MemoryBoard from "./MemoryBoard";
+import MonsterParade from "./MonsterParade";
 
 export default function MemoryGame() {
   const game = useMemoryGame();
 
-  if (!game.hasStarted) return <IntroScreen onStart={game.start} />;
+  if (!game.hasStarted) {
+    return (
+      <GameIntro
+        hero={<MonsterParade />}
+        title="Memory Cards"
+        blurb="Meet the Zololo monsters! Every monster has a twin hiding under the cards. Can you find them all?"
+        howToPlay={<HowToPlay {...MEMORY_HOW_TO_PLAY} />}
+        onStart={game.start}
+      />
+    );
+  }
 
   return (
     <main className="flex-1 pt-24 pb-20 sm:pt-28">

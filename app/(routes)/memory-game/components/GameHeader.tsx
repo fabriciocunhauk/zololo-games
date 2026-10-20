@@ -1,4 +1,5 @@
-import HowToPlay from "./HowToPlay";
+import HowToPlay from "@/app/components/HowToPlay";
+import { MEMORY_HOW_TO_PLAY } from "../constants/howToPlay";
 
 type GameHeaderProps = {
   level: number;
@@ -56,7 +57,7 @@ export default function GameHeader({
           <span className="group-open:hidden">Show how to play</span>
           <span className="hidden group-open:inline">Hide how to play</span>
         </summary>
-        <HowToPlay className="mt-4" />
+        <HowToPlay {...MEMORY_HOW_TO_PLAY} className="mt-4" />
       </details>
     </header>
   );

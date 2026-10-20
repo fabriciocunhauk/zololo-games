@@ -17,6 +17,16 @@
   --font-display: var(--font-bagel), ui-rounded, system-ui, sans-serif;
 }
 
+/* Number badges pop in as animals are counted. */
+@keyframes pop {
+  from {
+    transform: scale(0.4);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 @layer components {
   /* Chunky toy-block tile. Set --tile to the block colour, --depth to the edge height. */
   .toy-block {

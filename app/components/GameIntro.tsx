@@ -1,13 +1,26 @@
-import type { CSSProperties } from "react";
-import Container from "@/app/components/Container";
-import HowToPlay from "./HowToPlay";
-import MonsterParade from "./MonsterParade";
+import type { CSSProperties, ReactNode } from "react";
+import Container from "./Container";
+
+type GameIntroProps = {
+  hero: ReactNode;
+  title: string;
+  blurb: string;
+  howToPlay: ReactNode;
+  onStart: () => void;
+};
 
 const startStyle: CSSProperties & { "--tile": string } = {
   "--tile": "var(--color-sun)",
 };
 
-export default function IntroScreen({ onStart }: { onStart: () => void }) {
+/** Shared start screen: hero art, title, how to play, and a big start button. */
+export default function GameIntro({
+  hero,
+  title,
+  blurb,
+  howToPlay,
+  onStart,
+}: GameIntroProps) {
   return (
     <main className="flex-1 pt-24 pb-20 sm:pt-32">
       <Container
@@ -18,17 +31,14 @@ export default function IntroScreen({ onStart }: { onStart: () => void }) {
         }}
       >
         <div className="flex flex-col items-center gap-5">
-          <MonsterParade />
+          {hero}
           <h1 className="font-display text-[clamp(2.5rem,7vw,4.5rem)] leading-[0.95]">
-            Memory Cards
+            {title}
           </h1>
-          <p className="max-w-xl text-lg text-ink/80 sm:text-xl">
-            Meet the Zololo monsters! Every monster has a twin hiding under the
-            cards. Can you find them all?
-          </p>
+          <p className="max-w-xl text-lg text-ink/80 sm:text-xl">{blurb}</p>
         </div>
 
-        <HowToPlay />
+        {howToPlay}
 
         <button
           type="button"
