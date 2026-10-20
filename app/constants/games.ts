@@ -1,5 +1,5 @@
 import type { StaticImageData } from "next/image";
-import memoryImage from "@/public/images/memory-game/bluey-bingo-family.avif";
+import memoryImage from "@/public/images/memory-game/memory-cards.svg";
 import crittersImage from "@/public/images/critters/bear.png";
 import frogImage from "@/public/images/frog-jump/frog.png";
 import bubblesImage from "@/public/images/bubble-pop/bubbles.png";

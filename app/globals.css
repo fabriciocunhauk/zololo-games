@@ -7,6 +7,8 @@
   --color-sun: #ffc94d;
   --color-leaf: #7cc47f;
   --color-sky: #8cc8f0;
+  --color-tangerine: #ff9f5a;
+  --color-grape: #b69cf0;
 }
 
 /* next/font sets these variables on <html>; inline so utilities read them directly. */
@@ -16,14 +18,15 @@
 }
 
 @layer components {
-  /* Chunky toy-block tile. Set --tile to the block colour. */
+  /* Chunky toy-block tile. Set --tile to the block colour, --depth to the edge height. */
   .toy-block {
     --tile: var(--color-pink-primary);
+    --depth: 10px;
     --edge: color-mix(in oklab, var(--tile) 55%, var(--color-ink));
     background: var(--tile);
     border: 3px solid var(--color-ink);
     border-radius: 1.25rem;
-    box-shadow: 0 10px 0 var(--edge);
+    box-shadow: 0 var(--depth) 0 var(--edge);
     transition:
       transform 120ms ease-out,
       box-shadow 120ms ease-out;
@@ -31,11 +34,11 @@
 
   .toy-block:hover {
     transform: translateY(-3px);
-    box-shadow: 0 13px 0 var(--edge);
+    box-shadow: 0 calc(var(--depth) + 3px) 0 var(--edge);
   }
 
   .toy-block:active {
-    transform: translateY(8px);
+    transform: translateY(calc(var(--depth) - 2px));
     box-shadow: 0 2px 0 var(--edge);
   }
 

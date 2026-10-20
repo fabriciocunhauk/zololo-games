@@ -1,51 +1,53 @@
 "use client";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { classNames } from "@/app/utils/appearance";
-import type { CardFace } from "../constants/cardImages";
+import { motion, useReducedMotion } from "framer-motion";
+import type { Monster } from "../constants/monsters";
+import type { CardState } from "../hooks/useMemoryGame";
+import CardBack from "./CardBack";
+import CardFront from "./CardFront";
 
 type MemoryCardProps = {
-  face: CardFace;
+  monster: Monster;
   position: number;
-  isFaceUp: boolean;
-  aspect: string;
+  state: CardState;
   onFlip: () => void;
 };
 
+const faceClasses =
+  "absolute inset-0 rounded-2xl shadow-[0_5px_0_var(--color-ink)] [backface-visibility:hidden]";
+
 export default function MemoryCard({
-  face,
+  monster,
   position,
-  isFaceUp,
-  aspect,
+  state,
   onFlip,
 }: MemoryCardProps) {
+  const reduceMotion = useReducedMotion();
+  const isFaceUp = state !== "down";
+
   return (
     <motion.button
       type="button"
-      aria-label={isFaceUp ? face.name : `Card ${position}, face down`}
-      className={classNames(
-        "w-full max-w-[120px] sm:max-w-[140px] md:max-w-[160px] p-1 flex items-center justify-center cursor-pointer bg-white border-2 sm:border-4 border-pink-primary relative transition-transform duration-200 shadow-md sm:shadow-xl",
-        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink",
-        isFaceUp &&
-          "hover:scale-105 hover:ring-2 sm:hover:ring-4 hover:ring-pink-primary/40",
-        aspect
-      )}
+      data-state={state}
+      aria-label={isFaceUp ? monster.name : `Card ${position}, face down`}
       onClick={onFlip}
+      className="relative aspect-square w-full max-w-[120px] sm:max-w-[140px] md:max-w-[160px] cursor-pointer rounded-2xl [transform-style:preserve-3d] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-4 focus-visible:ring-offset-paper"
+      style={{ transformPerspective: 800 }}
       initial={false}
       animate={{ rotateY: isFaceUp ? 180 : 0 }}
-      transition={{ duration: 0.1 }}
-      style={{ perspective: 1000, transformStyle: "preserve-3d" }}
+      transition={
+        reduceMotion
+          ? { duration: 0 }
+          : { type: "spring", stiffness: 260, damping: 22 }
+      }
+      whileHover={!isFaceUp && !reduceMotion ? { y: -4 } : undefined}
+      whileTap={!isFaceUp && !reduceMotion ? { scale: 0.95 } : undefined}
     >
-      <div className="w-full h-full" style={{ transformStyle: "preserve-3d" }}>
-        <Image
-          className="object-cover h-full w-full absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]"
-          src={face.image}
-          alt=""
-        />
-        <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-pink-primary rounded text-white text-2xl sm:text-3xl font-display select-none [backface-visibility:hidden]">
-          ?
-        </div>
-      </div>
+      <span className={faceClasses}>
+        <CardBack />
+      </span>
+      <span className={`${faceClasses} [transform:rotateY(180deg)]`}>
+        <CardFront monster={monster} isMatched={state === "matched"} />
+      </span>
     </motion.button>
   );
 }

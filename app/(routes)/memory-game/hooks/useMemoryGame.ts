@@ -1,19 +1,21 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
-import { CARD_FACES, type CardFace } from "../constants/cardImages";
 import { MEMORY_CONFIG } from "../constants/config";
+import { MONSTERS, type Monster } from "../constants/monsters";
 import {
   createShuffledDeck,
   type MemoryCardData,
 } from "../utils/createShuffledDeck";
 
+export type CardState = "down" | "up" | "matched";
+
 export function useMemoryGame() {
+  const [hasStarted, setHasStarted] = useState(false);
   const [level, setLevel] = useState<number>(MEMORY_CONFIG.startLevel);
-  const [deck, setDeck] = useState<MemoryCardData<CardFace>[]>([]);
+  const [deck, setDeck] = useState<MemoryCardData<Monster>[]>([]);
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
-  const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
   const [isBusy, setIsBusy] = useState(false);
   const [gameWon, setGameWon] = useState(false);
@@ -22,10 +24,9 @@ export function useMemoryGame() {
   const dealBoard = useCallback(
     (forLevel: number) => {
       clearAll();
-      setDeck(createShuffledDeck(forLevel, CARD_FACES));
+      setDeck(createShuffledDeck(forLevel, MONSTERS));
       setFlipped([]);
       setMatched([]);
-      setScore(0);
       setMoves(0);
       setGameWon(false);
       setIsBusy(false);
@@ -35,8 +36,8 @@ export function useMemoryGame() {
 
   // Deal on the client only: shuffling during render would mismatch hydration.
   useEffect(() => {
-    dealBoard(level);
-  }, [level, dealBoard]);
+    if (hasStarted) dealBoard(level);
+  }, [hasStarted, level, dealBoard]);
 
   useEffect(() => {
     if (gameWon || deck.length === 0 || matched.length !== deck.length) return;
@@ -63,7 +64,6 @@ export function useMemoryGame() {
       if (deck[firstIdx].pairId === deck[idx].pairId) {
         schedule(() => {
           setMatched((prev) => [...prev, firstIdx, idx]);
-          setScore((s) => s + MEMORY_CONFIG.points);
           setFlipped([]);
           setIsBusy(false);
         }, MEMORY_CONFIG.matchDelayMs);
@@ -77,12 +77,29 @@ export function useMemoryGame() {
     [isBusy, flipped, matched, deck, schedule]
   );
 
-  const reset = useCallback(() => dealBoard(level), [dealBoard, level]);
+  const start = useCallback(() => setHasStarted(true), []);
+  const restartLevel = useCallback(() => dealBoard(level), [dealBoard, level]);
 
-  const isFaceUp = useCallback(
-    (idx: number) => flipped.includes(idx) || matched.includes(idx),
+  const cardState = useCallback(
+    (idx: number): CardState => {
+      if (matched.includes(idx)) return "matched";
+      return flipped.includes(idx) ? "up" : "down";
+    },
     [flipped, matched]
   );
 
-  return { level, deck, score, moves, gameWon, isFaceUp, flipCard, reset };
+  return {
+    hasStarted,
+    level,
+    isLastLevel: level >= MEMORY_CONFIG.maxLevel,
+    deck,
+    moves,
+    pairsFound: matched.length / 2,
+    totalPairs: deck.length / 2,
+    gameWon,
+    cardState,
+    flipCard,
+    start,
+    restartLevel,
+  };
 }
