@@ -3,6 +3,7 @@ import memoryImage from "@/public/images/memory-game/memory-cards.svg";
 import animalsImage from "@/public/images/animals/duck.png";
 import frogImage from "@/public/images/frog-jump/frog.png";
 import bubblesImage from "@/public/images/bubble-pop/bubbles.png";
+import oddOneOutImage from "@/public/images/odd-one-out/odd-one-out.svg";
 
 export type Game = {
   name: string;
@@ -42,5 +43,12 @@ export const GAMES: ReadonlyArray<Game> = Object.freeze([
     image: bubblesImage,
     skill: "Adding & taking away",
     tile: "var(--color-sun)",
+  },
+  {
+    name: "Odd One Out",
+    href: "/odd-one-out",
+    image: oddOneOutImage,
+    skill: "Spot the difference",
+    tile: "var(--color-leaf)",
   },
 ]);
