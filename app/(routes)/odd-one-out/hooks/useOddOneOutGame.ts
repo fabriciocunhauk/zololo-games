@@ -7,6 +7,7 @@ import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
 import { ODD_CONFIG, ODD_DIFFICULTY } from "../constants/config";
 import { makeOddOneOut, type OddOneOutRound } from "../utils/makeOddOneOut";
+import { spottedText } from "../utils/spottedText";
 
 /** How the round ended: the child spotted it, or we showed them. */
 export type RoundOutcome = "spotted" | "revealed" | null;
@@ -69,13 +70,14 @@ export function useOddOneOutGame() {
 
       if (position === round.oddIndex) {
         const next = progress.recordCorrect();
-        const levelUp = next.levelUp
-          ? ` Level up! Now there are ${settings.levels[next.level]} monsters.`
-          : "";
         setOutcome("spotted");
         setFeedback({
           tone: "success",
-          text: `🎉 You spotted it! ${round.description}${levelUp}`,
+          text: spottedText(
+            round.description,
+            next,
+            settings.levels[next.level]
+          ),
         });
         schedule(
           () => startRound(difficulty, next.level, baseName),

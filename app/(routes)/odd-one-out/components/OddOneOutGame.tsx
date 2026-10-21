@@ -60,7 +60,7 @@ export default function OddOneOutGame() {
           Which monster is different?
         </p>
         <MonsterGrid
-          key={round.id}
+          roundId={round.id}
           tiles={round.tiles}
           oddIndex={round.oddIndex}
           wrongTaps={game.wrongTaps}

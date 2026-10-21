@@ -1,13 +1,16 @@
 "use client";
 import { motion, useReducedMotion, type TargetAndTransition } from "framer-motion";
-import type { CSSProperties } from "react";
+import { useRef, type CSSProperties } from "react";
 import type { Monster } from "@/app/components/monsters/monsters";
 import MonsterArt from "@/app/components/monsters/MonsterArt";
+import { useFocusRescue } from "@/app/hooks/useFocusRescue";
 import { classNames } from "@/app/utils/appearance";
 import type { RoundOutcome } from "../hooks/useOddOneOutGame";
 import { monsterLook } from "../utils/makeOddOneOut";
 
 type MonsterGridProps = {
+  /** A new id deals a fresh grid. */
+  roundId: number;
   tiles: ReadonlyArray<Monster>;
   oddIndex: number;
   /** Tiles tapped by mistake this round. */
@@ -46,6 +49,7 @@ const pulse: TargetAndTransition = {
 
 /** The grid of look-alike monsters. Names never give the answer away. */
 export default function MonsterGrid({
+  roundId,
   tiles,
   oddIndex,
   wrongTaps,
@@ -53,6 +57,9 @@ export default function MonsterGrid({
   onTap,
 }: MonsterGridProps) {
   const reduceMotion = useReducedMotion();
+  // Outlives each round's grid, so focus moves to the new tiles.
+  const area = useRef<HTMLDivElement>(null);
+  useFocusRescue(area);
   const { columns, width } = layout(tiles.length);
   const gridStyle: CSSProperties = {
     gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
@@ -67,42 +74,58 @@ export default function MonsterGrid({
   };
 
   return (
-    <div
-      role="group"
-      aria-label="Monsters"
-      style={gridStyle}
-      className={classNames("grid w-full gap-3 sm:gap-4", width)}
-    >
-      {tiles.map((monster, idx) => {
-        const isOdd = idx === oddIndex;
-        const isWrong = wrongTaps.includes(idx);
-        const isShown = isOdd && outcome !== null;
-        const isOver = outcome !== null;
-        return (
-          <motion.button
-            key={idx}
-            type="button"
-            data-testid="monster-tile"
-            data-look={monsterLook(monster)}
-            aria-label={`Monster ${idx + 1}`}
-            onClick={() => onTap(idx)}
-            disabled={isWrong || isOver}
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1, x: 0, y: 0, ...motionFor(idx) }}
-            transition={{ duration: 0.25, delay: reduceMotion ? 0 : idx * 0.03 }}
-            style={tileStyle}
-            className={classNames(
-              "toy-block flex aspect-square min-h-12 items-center justify-center p-1.5 sm:p-2.5",
-              (isWrong || isOver) && "pointer-events-none",
-              isWrong && "opacity-50 ring-[5px] ring-pink-primary ring-offset-2",
-              isOver && !isShown && !isWrong && "opacity-60",
-              isShown && "ring-[6px] ring-leaf ring-offset-2"
-            )}
-          >
-            <MonsterArt monster={monster} className="h-full w-full" />
-          </motion.button>
-        );
-      })}
+    <div ref={area} className="flex w-full justify-center">
+      <div
+        key={roundId}
+        role="group"
+        aria-label="Monsters"
+        style={gridStyle}
+        className={classNames("grid w-full gap-3 sm:gap-4", width)}
+      >
+        {tiles.map((monster, idx) => {
+          const isOdd = idx === oddIndex;
+          const isWrong = wrongTaps.includes(idx);
+          const isShown = isOdd && outcome !== null;
+          const isOver = outcome !== null;
+          const isLocked = isWrong || isOver;
+          return (
+            // Motion lives on a wrapper: framer's inline transform on the
+            // button would override the toy-block hover and press.
+            <motion.div
+              key={idx}
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1, x: 0, y: 0, ...motionFor(idx) }}
+              transition={{
+                duration: 0.25,
+                delay: reduceMotion ? 0 : idx * 0.03,
+              }}
+            >
+              {/* aria-disabled, not disabled: the tile keeps keyboard focus. */}
+              <button
+                type="button"
+                data-testid="monster-tile"
+                data-look={monsterLook(monster)}
+                aria-label={`Monster ${idx + 1}`}
+                aria-disabled={isLocked}
+                onClick={() => {
+                  if (!isLocked) onTap(idx);
+                }}
+                style={tileStyle}
+                className={classNames(
+                  "toy-block flex aspect-square w-full min-h-12 items-center justify-center p-1.5 sm:p-2.5",
+                  isLocked && "cursor-default",
+                  isWrong &&
+                    "opacity-50 ring-[5px] ring-pink-primary ring-offset-2",
+                  isOver && !isShown && !isWrong && "opacity-60",
+                  isShown && "ring-[6px] ring-leaf ring-offset-2"
+                )}
+              >
+                <MonsterArt monster={monster} className="h-full w-full" />
+              </button>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 }
