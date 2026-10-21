@@ -37,6 +37,20 @@ describe("generateLetterRound: choose the first letter", () => {
   });
 });
 
+describe("generateLetterRound: pictures with another name", () => {
+  const puppy = [{ word: "dog", emoji: "🐶", cvc: true, alsoCalled: ["puppy"] }];
+
+  it("never offers the other name's first letter as a distractor", () => {
+    for (const settings of Object.values(LETTER_DIFFICULTY)) {
+      for (let i = 0; i < RUNS; i++) {
+        const round = generateLetterRound(puppy, settings);
+        const tiles = round.kind === "choose" ? round.options : round.bank;
+        expect(tiles.map((l) => l.toLowerCase())).not.toContain("p");
+      }
+    }
+  });
+});
+
 describe("generateLetterRound: spell a CVC word", () => {
   const settings = LETTER_DIFFICULTY.hard;
 

@@ -31,6 +31,11 @@ function pickDistractors(avoid: ReadonlyArray<string>, count: number) {
   return shuffle(ALPHABET.filter((l) => !blocked.has(l))).slice(0, count);
 }
 
+/** First letters of the picture's other names, so a fair guess is never marked wrong. */
+function otherNameLetters(word: PictureWord) {
+  return (word.alsoCalled ?? []).map(firstLetter);
+}
+
 /** Any word but the previous one (unless it's the only one). */
 function pickWord(words: ReadonlyArray<PictureWord>, previous?: string) {
   const fresh = words.filter((w) => w.word !== previous);
@@ -47,7 +52,10 @@ function chooseRound(
   const letter = firstLetter(word.word);
   const options = shuffle([
     letter,
-    ...pickDistractors([letter], settings.optionCount - 1),
+    ...pickDistractors(
+      [letter, ...otherNameLetters(word)],
+      settings.optionCount - 1
+    ),
   ]).map((l) => withCase(l, settings.letterCase));
   return {
     kind: "choose",
@@ -69,7 +77,10 @@ function spellRound(
   const letters = word.word.split("");
   const bank = shuffle([
     ...letters,
-    ...pickDistractors(letters, settings.distractorCount),
+    ...pickDistractors(
+      [...letters, ...otherNameLetters(word)],
+      settings.distractorCount
+    ),
   ]);
   return { kind: "spell", word, bank };
 }

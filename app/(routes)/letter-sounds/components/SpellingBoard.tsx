@@ -1,6 +1,7 @@
 "use client";
 import { motion, useAnimate, useReducedMotion } from "framer-motion";
-import { useEffect, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
+import { useFocusRescue } from "@/app/hooks/useFocusRescue";
 import { classNames } from "@/app/utils/appearance";
 import type { Shake } from "../hooks/useLetterSoundsGame";
 
@@ -10,6 +11,7 @@ type SpellingBoardProps = {
   placed: ReadonlyArray<string>;
   usedTiles: ReadonlyArray<number>;
   shake: Shake | null;
+  /** Taps are ignored (not disabled, so keyboard focus stays put). */
   disabled: boolean;
   onPick: (tile: number) => void;
 };
@@ -41,18 +43,23 @@ function BankTile({ letter, used, disabled, shakeKey, onPick }: BankTileProps) {
     );
   }, [shakeKey, reduceMotion, animate, scope]);
 
+  const isLocked = disabled || used;
+
   return (
     <motion.span ref={scope} className="block">
+      {/* aria-disabled, not disabled: the tile keeps keyboard focus. */}
       <button
         type="button"
-        onClick={onPick}
-        disabled={disabled || used}
+        onClick={() => {
+          if (!isLocked) onPick();
+        }}
+        aria-disabled={isLocked}
         aria-label={used ? `${letter}, used` : letter}
         style={tileStyle}
         className={classNames(
           "toy-block flex h-16 w-16 items-center justify-center font-display text-3xl sm:h-20 sm:w-20 sm:text-4xl",
           used && "opacity-30",
-          (disabled || used) && "pointer-events-none"
+          isLocked && "cursor-default"
         )}
       >
         {letter}
@@ -72,6 +79,8 @@ export default function SpellingBoard({
   onPick,
 }: SpellingBoardProps) {
   const complete = placed.length === word.length;
+  const bankArea = useRef<HTMLDivElement>(null);
+  useFocusRescue(bankArea);
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
@@ -100,10 +109,16 @@ export default function SpellingBoard({
         })}
       </ol>
 
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-6 sm:gap-4">
+      <div
+        ref={bankArea}
+        role="group"
+        aria-label="Letter blocks"
+        className="grid grid-cols-3 gap-3 sm:grid-cols-6 sm:gap-4"
+      >
+        {/* Keyed by place, so a focused tile stays mounted into the next round. */}
         {bank.map((letter, idx) => (
           <BankTile
-            key={`${letter}-${idx}`}
+            key={idx}
             letter={letter}
             used={usedTiles.includes(idx)}
             disabled={disabled}

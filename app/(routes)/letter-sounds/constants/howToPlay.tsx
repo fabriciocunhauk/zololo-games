@@ -25,7 +25,7 @@ const steps: ReadonlyArray<HowToPlayStep> = [
     ),
   },
   {
-    text: "On Hard, spell the word one letter at a time. Get 5 stars to go up a level!",
+    text: "On Hard, spell the word one letter at a time. Spell it with no slips to earn a star. Get 5 stars to go up a level!",
     picture: (
       <>
         <LetterBlock letter="c" tile="var(--color-sun)" depth="4px" />

@@ -3,6 +3,22 @@ import { PICTURE_WORDS } from "./words";
 
 const MIN_CVC_WORDS = 12;
 
+/** Newer emoji draw as empty boxes on older tablets. */
+const MAX_EMOJI_VERSION = 12;
+
+/**
+ * The Emoji version that introduced each picture. To add a word, look its
+ * emoji up on emojipedia.org and list it here; anything newer than
+ * MAX_EMOJI_VERSION fails (e.g. 🪺 nest is 15.0, 🪵 wood is 13.0).
+ */
+const EMOJI_VERSION: Readonly<Record<string, number>> = {
+  "🍎": 1, "🐜": 1, "🦇": 3, "🛏️": 1, "🗑️": 1, "🚌": 1, "🐱": 1, "🐶": 1,
+  "🦆": 3, "🥚": 3, "🐘": 1, "🐟": 1, "🦊": 3, "🐸": 1, "🐐": 1, "🎩": 1,
+  "🦔": 5, "🪁": 12, "🦘": 11, "🦵": 11, "🦁": 1, "🌙": 1, "🗺️": 1, "👃": 1,
+  "🐙": 1, "🐷": 1, "🖊️": 1, "🌈": 1, "🤖": 1, "☀️": 1, "⛺": 1, "☂️": 1,
+  "🌋": 1, "🧙": 5, "🪀": 12, "🦓": 5,
+};
+
 describe("PICTURE_WORDS", () => {
   it("has about three dozen words, each listed once", () => {
     expect(PICTURE_WORDS.length).toBeGreaterThanOrEqual(30);
@@ -22,6 +38,25 @@ describe("PICTURE_WORDS", () => {
     for (const { word } of PICTURE_WORDS) {
       expect(word).not.toMatch(/^(sh|ch|th|wh|ph|kn|wr|gn)/);
       expect(word).not.toMatch(/^[cg][eiy]/);
+    }
+  });
+
+  it("only uses emoji that older tablets can draw", () => {
+    for (const { word, emoji } of PICTURE_WORDS) {
+      const version = EMOJI_VERSION[emoji];
+      expect(version, `${word}: list ${emoji} in EMOJI_VERSION`).toBeDefined();
+      expect(version, `${word}: ${emoji} is too new`).toBeLessThanOrEqual(
+        MAX_EMOJI_VERSION
+      );
+    }
+  });
+
+  it("gives other names in lowercase, never the word itself", () => {
+    for (const { word, alsoCalled = [] } of PICTURE_WORDS) {
+      for (const name of alsoCalled) {
+        expect(name).toMatch(/^[a-z]+( [a-z]+)*$/);
+        expect(name).not.toBe(word);
+      }
     }
   });
 
