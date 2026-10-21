@@ -20,7 +20,7 @@ const bodyFont = Atkinson_Hyperlegible({
 export const metadata: Metadata = {
   title: { default: "Zololo Games", template: "%s · Zololo Games" },
   description:
-    "Short counting, adding and memory games for children aged 4 to 8.",
+    "Short games for counting, sums, phonics, shapes, patterns and memory, for children aged 4 to 8 and up.",
 };
 
 export default function RootLayout({

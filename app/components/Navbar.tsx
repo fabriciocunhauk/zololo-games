@@ -15,10 +15,10 @@ export default function Navbar() {
         aria-label="Zololo Games home"
         className="rounded focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink"
       >
-        <Logo className="h-9 lg:h-11" />
+        <Logo className="h-9 2xl:h-11" />
       </Link>
 
-      <ul className="hidden lg:flex items-center gap-8">
+      <ul className="hidden 2xl:flex items-center gap-6 whitespace-nowrap">
         {NAV_ITEMS.map(({ label, href }) => (
           <li key={href}>
             <NavLink href={href}>{label}</NavLink>

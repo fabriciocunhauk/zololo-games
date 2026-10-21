@@ -26,7 +26,7 @@ export default function MobileMenu({
   }, [isOpen]);
 
   return (
-    <div className="lg:hidden">
+    <div className="2xl:hidden">
       <button
         type="button"
         aria-label="Open menu"

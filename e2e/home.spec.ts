@@ -5,6 +5,10 @@ const games = [
   { name: "Count the Animals", path: "/count-the-animals" },
   { name: "Frog Jump", path: "/frog-jump" },
   { name: "Bubble Pop", path: "/bubble-pop" },
+  { name: "Odd One Out", path: "/odd-one-out" },
+  { name: "Letter Sounds", path: "/letter-sounds" },
+  { name: "Shape Sorter", path: "/shape-sorter" },
+  { name: "Pattern Train", path: "/pattern-train" },
 ];
 
 test("home lists every game and each tile opens it", async ({ page }) => {
@@ -26,7 +30,7 @@ test("home lists every game and each tile opens it", async ({ page }) => {
 test("desktop nav links to every game and marks the current page", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.setViewportSize({ width: 1600, height: 800 });
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Main" });
   await expect(

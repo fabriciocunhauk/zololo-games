@@ -11,7 +11,8 @@ export default function Home() {
             Tap a game to play.
           </h1>
           <p className="mt-5 max-w-2xl text-lg sm:text-xl text-ink/80">
-            Short counting, adding and memory games for ages 4–8. Free to play,
+            Short games for counting, sums, letters, shapes and more. Pick
+            Easy (4–5), Medium (6–7) or Hard (8+) in every game. Free to play,
             nothing to sign up for.
           </p>
         </header>
