@@ -60,7 +60,9 @@ export function useFrogJumpGame() {
         const next = progress.recordCorrect();
         const text = next.levelUp
           ? `🎉 Excellent! Level up! Now jumps go up to ${settings.levels[next.level].max}.`
-          : "🎉 Excellent!";
+          : next.stars === 0
+            ? "🎉 Excellent! Another row of stars!"
+            : "🎉 Excellent!";
         setFeedback({ tone: "success", text });
         schedule(
           () => startRound(difficulty, next.level, problem),
