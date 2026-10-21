@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getBoardLayout } from "./getBoardLayout";
+import { getBoardAspect, getBoardLayout } from "./getBoardLayout";
 
 describe("getBoardLayout", () => {
   it("lays the first level out in one row on wider screens", () => {
@@ -15,5 +15,13 @@ describe("getBoardLayout", () => {
     expect(getBoardLayout(40)).toBe(
       "grid-cols-4 sm:grid-cols-5 md:grid-cols-6"
     );
+  });
+});
+
+describe("getBoardAspect", () => {
+  it("is wide for one row and squarer as rows are added", () => {
+    expect(getBoardAspect(4)).toBe(4);
+    expect(getBoardAspect(12)).toBe(4 / 3);
+    expect(getBoardAspect(28)).toBe(6 / 5);
   });
 });

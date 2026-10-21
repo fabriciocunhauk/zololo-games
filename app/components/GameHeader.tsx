@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { difficultyOption, type Difficulty } from "@/app/constants/difficulty";
 import HeaderButton from "./HeaderButton";
+import ScrollToTop from "./ScrollToTop";
 
 type GameHeaderProps = {
   title: string;
@@ -31,19 +32,20 @@ export default function GameHeader({
   const chipStyle: CSSProperties = { background: option.tile };
 
   return (
-    <header className="flex w-full flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-col items-start gap-2">
-          <h1 className="font-display text-3xl sm:text-4xl">{title}</h1>
+    <header className="flex w-full flex-col gap-3 sm:gap-4">
+      <ScrollToTop />
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 sm:flex-col sm:items-start sm:gap-2">
+          <h1 className="font-display text-2xl sm:text-4xl">{title}</h1>
           <p
             data-testid="difficulty"
             style={chipStyle}
-            className="rounded-full border-[3px] border-ink px-3 py-0.5 text-sm font-bold"
+            className="rounded-full border-[3px] border-ink px-2.5 py-0.5 text-xs font-bold sm:px-3 sm:text-sm"
           >
             {option.label} · {option.ages}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {meter}
           {stats && <dl className="flex gap-2 sm:gap-3">{stats}</dl>}
           {actions}

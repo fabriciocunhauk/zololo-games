@@ -7,7 +7,8 @@ type LilyPadProps = {
   className?: string;
 };
 
-const PAD = "M24 16 L40.9 8.3 A22 12 0 1 1 31.5 4.7 Z";
+// The notch starts near the rim, clear of the number in the middle.
+const PAD = "M35 9.5 L40.9 8.3 A22 12 0 1 1 31.5 4.7 Z";
 
 /** One numbered lily pad on the pond. Purely visual. */
 export default function LilyPad({

@@ -19,7 +19,7 @@ export default function HeaderButton({
       type="button"
       onClick={onClick}
       className={classNames(
-        "rounded-xl border-[3px] border-ink px-4 py-3 font-bold shadow-[0_4px_0_var(--color-ink)] transition-transform active:translate-y-[3px] active:shadow-[0_1px_0_var(--color-ink)] motion-reduce:transition-none motion-reduce:active:translate-y-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-2",
+        "min-h-11 rounded-xl border-[3px] border-ink px-3 py-2 text-sm font-bold sm:px-4 sm:py-3 sm:text-base shadow-[0_4px_0_var(--color-ink)] transition-transform active:translate-y-[3px] active:shadow-[0_1px_0_var(--color-ink)] motion-reduce:transition-none motion-reduce:active:translate-y-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-2",
         tone
       )}
     >

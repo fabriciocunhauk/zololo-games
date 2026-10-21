@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import type { Difficulty } from "@/app/constants/difficulty";
 import Container from "./Container";
 import DifficultyPicker from "./DifficultyPicker";
+import ScrollToTop from "./ScrollToTop";
 
 type GameIntroProps = {
   hero: ReactNode;
@@ -29,6 +30,7 @@ export default function GameIntro({
 }: GameIntroProps) {
   return (
     <main className="flex-1 pt-24 pb-20 sm:pt-32">
+      <ScrollToTop />
       <Container
         size="md"
         classes={{

@@ -13,7 +13,7 @@ export default function Navbar() {
       <Link
         href="/"
         aria-label="Zololo Games home"
-        className="rounded focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink"
+        className="rounded py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink"
       >
         <Logo className="h-9 2xl:h-11" />
       </Link>

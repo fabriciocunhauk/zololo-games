@@ -14,7 +14,7 @@ export default function StarMeter({
   caption,
 }: StarMeterProps) {
   return (
-    <div className="rounded-xl border-[3px] border-ink bg-white px-3 py-1.5 shadow-[0_4px_0_var(--color-ink)]">
+    <div className="rounded-xl border-[3px] border-ink bg-white px-2 py-1 sm:px-3 sm:py-1.5 shadow-[0_4px_0_var(--color-ink)]">
       <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em]">
         Level <span data-testid="level">{level}</span>
         {caption && ` · ${caption}`}
@@ -24,7 +24,7 @@ export default function StarMeter({
         aria-label={`${stars} of ${total} stars`}
         data-testid="stars"
         data-stars={stars}
-        className="text-xl leading-tight tracking-wider"
+        className="text-lg leading-tight tracking-wider sm:text-xl"
       >
         {Array.from({ length: total }, (_, i) => (
           <span key={i} className={i < stars ? "text-ink" : "text-ink/20"}>

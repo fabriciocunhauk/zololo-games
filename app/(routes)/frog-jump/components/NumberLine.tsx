@@ -60,7 +60,7 @@ export default function NumberLine({ line, start, landing }: NumberLineProps) {
       <p className="sr-only">
         Lily pads from {line.min} to {line.max}. The frog is on {frogAt}.
       </p>
-      <div className="px-1.5 pt-20 pb-3 [--cell:2.5rem] lg:[--cell:1.8rem]">
+      <div className="px-1.5 pt-20 pb-3 [--cell:3rem]">
         <div className="relative" style={trackStyle}>
           <ol aria-hidden className="flex">
             {values.map((value) => (

@@ -49,7 +49,7 @@ export default function BubbleField({
   return (
     <div
       ref={areaRef}
-      className="relative h-80 w-full overflow-hidden rounded-3xl border-[3px] border-ink bg-sky/25 shadow-[0_8px_0_var(--color-ink)] sm:h-96 lg:h-[28rem]"
+      className="relative h-80 w-full overflow-hidden rounded-3xl border-[3px] border-ink bg-sky/25 shadow-[0_8px_0_var(--color-ink)] sm:h-96 lg:h-[28rem] landscape:h-[clamp(16rem,calc(100svh-25rem),28rem)]"
     >
       <AnimatePresence custom={poppedId}>
         {bubbles.map((bubble, idx) => {

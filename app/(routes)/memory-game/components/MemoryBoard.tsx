@@ -1,8 +1,9 @@
+import type { CSSProperties } from "react";
 import { classNames } from "@/app/utils/appearance";
 import type { Monster } from "@/app/components/monsters/monsters";
 import type { CardState } from "../hooks/useMemoryGame";
 import type { MemoryCardData } from "../utils/createShuffledDeck";
-import { getBoardLayout } from "../utils/getBoardLayout";
+import { getBoardAspect, getBoardLayout } from "../utils/getBoardLayout";
 import MemoryCard from "./MemoryCard";
 import MonsterArt from "@/app/components/monsters/MonsterArt";
 
@@ -53,10 +54,17 @@ export default function MemoryBoard({
     );
   }
 
+  // On landscape screens, keep the whole board within the window height.
+  const boardStyle = {
+    "--board-aspect": getBoardAspect(deck.length),
+  } as CSSProperties;
+
   return (
     <div
+      style={boardStyle}
       className={classNames(
-        "grid justify-items-center gap-3 sm:gap-5",
+        "mx-auto grid w-full justify-items-center gap-3 sm:gap-5",
+        "landscape:max-w-[max(20rem,calc((100svh-18rem)*var(--board-aspect)))]",
         getBoardLayout(deck.length)
       )}
     >
