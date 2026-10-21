@@ -1,6 +1,7 @@
 "use client";
 import { motion, useAnimate, useReducedMotion } from "framer-motion";
-import { useEffect, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
+import { useFocusRescue } from "@/app/hooks/useFocusRescue";
 import { classNames } from "@/app/utils/appearance";
 import type { Bin } from "../constants/bins";
 import type { DroppedShape, Shake } from "../hooks/useShapeSorterGame";
@@ -32,8 +33,12 @@ export default function SortingBins({
   busy,
   onSort,
 }: SortingBinsProps) {
+  const area = useRef<HTMLDivElement>(null);
+  useFocusRescue(area);
+
   return (
     <div
+      ref={area}
       role="group"
       aria-label="Sorting bins"
       className={classNames(
@@ -41,9 +46,11 @@ export default function SortingBins({
         columns[bins.length] ?? "grid-cols-2"
       )}
     >
-      {bins.map((bin) => (
+      {/* Keyed by place: colour bins change each round, and a focused bin
+          should stay mounted rather than lose focus. */}
+      {bins.map((bin, idx) => (
         <SortingBin
-          key={bin.id}
+          key={idx}
           bin={bin}
           count={counts[bin.id] ?? 0}
           dropped={dropped[bin.id]}

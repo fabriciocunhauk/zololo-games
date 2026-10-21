@@ -51,6 +51,10 @@ export default function ShapeTray({
             />
           </motion.div>
         )}
+        {/* Announces each new shape; the feedback keeps the only role="status". */}
+        <p aria-live="polite" className="sr-only">
+          {shape ? `Here comes ${describeShape(shape)}.` : ""}
+        </p>
         {isComplete && (
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}

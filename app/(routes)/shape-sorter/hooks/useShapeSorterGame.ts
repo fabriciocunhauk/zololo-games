@@ -10,6 +10,7 @@ import type { Shape } from "../constants/shapes";
 import { binFor } from "../utils/binFor";
 import { generateTray } from "../utils/generateShape";
 import { pickBins } from "../utils/pickBins";
+import { roundCompleteText } from "../utils/roundCompleteText";
 
 type Round = { id: number; bins: Bin[]; tray: Shape[] };
 
@@ -84,12 +85,7 @@ export function useShapeSorterGame() {
     (forDifficulty: Difficulty) => {
       const next = progress.recordCorrect();
       setPhase("complete");
-      setFeedback({
-        tone: "success",
-        text: next.levelUp
-          ? "🎉 Round complete! You earned a star and went up a level!"
-          : "🎉 Round complete! You earned a star.",
-      });
+      setFeedback({ tone: "success", text: roundCompleteText(next) });
       schedule(
         () => startRound(forDifficulty, next.level),
         SHAPE_CONFIG.roundCompleteMs
