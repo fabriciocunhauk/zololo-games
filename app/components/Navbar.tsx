@@ -1,8 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import { NAV_ITEMS } from "@/app/constants/navItems";
-import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
 import NavLink from "./NavLink";
+import lockup from "@/public/images/brand/zololo-games-lockup.png";
 
 export default function Navbar() {
   return (
@@ -15,7 +16,12 @@ export default function Navbar() {
         aria-label="Zololo Games home"
         className="rounded py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink"
       >
-        <Logo className="h-9 2xl:h-11" />
+        <Image
+          src={lockup}
+          alt=""
+          priority
+          className="h-14 w-auto sm:h-16"
+        />
       </Link>
 
       <ul className="hidden 2xl:flex items-center gap-6 whitespace-nowrap">
