@@ -1,35 +1,85 @@
-import type { ReactNode } from "react";
-import Container from "@/app/components/Container";
+"use client";
+import { useReducedMotion } from "framer-motion";
+import { useEffect, useRef, type CSSProperties } from "react";
+import type { NumberRange } from "../constants/config";
+import HoppingFrog from "./HoppingFrog";
+import LilyPad from "./LilyPad";
 
-export default function NumberLine({
-  max,
-  getPosition,
-  children,
-}: {
-  max: number;
-  getPosition: (value: number) => string;
-  children?: ReactNode;
-}) {
+type NumberLineProps = {
+  line: NumberRange;
+  start: number;
+  /** Where the frog lands, once an answer is in. */
+  landing: number | null;
+};
+
+/**
+ * Lily pads on a pond, one per number. Long lines scroll sideways inside the
+ * pond, which follows the frog.
+ */
+export default function NumberLine({ line, start, landing }: NumberLineProps) {
+  const reduceMotion = useReducedMotion();
+  const pond = useRef<HTMLDivElement>(null);
+  const hasScrolled = useRef(false);
+  const frogAt = landing ?? start;
+  const values = Array.from(
+    { length: line.max - line.min + 1 },
+    (_, idx) => line.min + idx,
+  );
+  const trackStyle: CSSProperties = {
+    minWidth: `calc(${values.length} * var(--cell))`,
+  };
+
+  // Keep the frog's pad in view when the line is wider than the screen.
+  useEffect(() => {
+    const scroller = pond.current;
+    const pad = scroller?.querySelector<HTMLElement>(
+      `[data-value="${frogAt}"]`,
+    );
+    if (!scroller || !pad) return;
+    const padBox = pad.getBoundingClientRect();
+    const pondBox = scroller.getBoundingClientRect();
+    const left =
+      scroller.scrollLeft +
+      padBox.left -
+      pondBox.left +
+      padBox.width / 2 -
+      scroller.clientWidth / 2;
+    const smooth = hasScrolled.current && !reduceMotion;
+    scroller.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
+    hasScrolled.current = true;
+  }, [frogAt, line, reduceMotion]);
+
   return (
-    <Container
-      classes={{
-        container:
-          "relative w-full bg-gradient-to-r from-blue-300 to-green-300 h-24 sm:h-32 rounded-full border-4 border-orange-400",
-      }}
+    <div
+      ref={pond}
+      role="region"
+      aria-label="Number line"
+      tabIndex={0}
+      className="w-full overflow-x-auto overscroll-x-contain rounded-3xl border-[3px] border-ink bg-sky shadow-[0_6px_0_var(--color-ink)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-2"
     >
-      {Array.from({ length: max + 1 }, (_, value) => (
-        <div
-          key={value}
-          className="flex flex-col items-center absolute top-13 bottom-0 -translate-x-1/2"
-          style={{ left: getPosition(value) }}
-        >
-          <div className="w-1 h-2 sm:h-3 bg-gray-700" />
-          <span className="text-xs sm:text-sm font-bold text-gray-800 -mt-1 sm:mt-0">
-            {value}
-          </span>
+      <p className="sr-only">
+        Lily pads from {line.min} to {line.max}. The frog is on {frogAt}.
+      </p>
+      <div className="px-1.5 pt-20 pb-3 [--cell:2.5rem] lg:[--cell:1.8rem]">
+        <div className="relative" style={trackStyle}>
+          <ol aria-hidden className="flex">
+            {values.map((value) => (
+              <li
+                key={value}
+                data-value={value}
+                className="min-w-0 flex-1 px-0.5"
+              >
+                <LilyPad
+                  value={value}
+                  isStart={value === start}
+                  className="mx-auto w-full max-w-16"
+                />
+              </li>
+            ))}
+          </ol>
+          <HoppingFrog line={line} from={start} to={frogAt} />
         </div>
-      ))}
-      {children}
-    </Container>
+      </div>
+    </div>
   );
 }

@@ -1,35 +1,61 @@
-import { FROG_JUMP_CONFIG } from "../constants/config";
 import { buildAnswerOptions } from "@/app/utils/buildAnswerOptions";
 import { randomInt } from "@/app/utils/randomInt";
+import {
+  FROG_JUMP_CONFIG,
+  type FrogJumpSettings,
+  type NumberRange,
+} from "../constants/config";
 
 export type JumpProblem = {
   start: number;
   operation: "+" | "-";
   jump: number;
   answer: number;
+  /** Ascending, so children can find their number in order. */
   options: number[];
 };
 
-export function generateJumpProblem(): JumpProblem {
-  const { min, max, maxStart, maxJump, optionCount, optionSpread } =
-    FROG_JUMP_CONFIG;
-  let start: number, operation: JumpProblem["operation"], jump: number;
-  let answer: number;
+const isSame = (a: JumpProblem, b?: JumpProblem) =>
+  !!b &&
+  a.start === b.start &&
+  a.operation === b.operation &&
+  a.jump === b.jump;
 
+function rollJump(
+  { line, backwards }: Pick<FrogJumpSettings, "line" | "backwards">,
+  jumps: NumberRange,
+): Omit<JumpProblem, "options"> {
+  const jump = randomInt(jumps.min, jumps.max);
+  const operation = backwards && Math.random() < 0.5 ? "-" : "+";
+  // Pick the start so the frog always lands on the line.
+  const start =
+    operation === "+"
+      ? randomInt(line.min, line.max - jump)
+      : randomInt(line.min + jump, line.max);
+  const answer = operation === "+" ? start + jump : start - jump;
+  return { start, operation, jump, answer };
+}
+
+/** A jump that lands on the line, never the same as `previous`. */
+export function generateJumpProblem(
+  settings: Pick<FrogJumpSettings, "line" | "backwards">,
+  jumps: NumberRange,
+  previous?: JumpProblem,
+): JumpProblem {
+  const { line } = settings;
+  let problem: JumpProblem;
+  let attempts = 0;
   do {
-    start = randomInt(1, maxStart);
-    operation = Math.random() < 0.5 ? "+" : "-";
-    jump = randomInt(1, maxJump);
-    answer = operation === "+" ? start + jump : start - jump;
-  } while (answer < min || answer > max);
-
-  const options = buildAnswerOptions({
-    answer,
-    count: optionCount,
-    min,
-    max,
-    spread: optionSpread,
-  });
-
-  return { start, operation, jump, answer, options };
+    const rolled = rollJump(settings, jumps);
+    const options = buildAnswerOptions({
+      answer: rolled.answer,
+      count: FROG_JUMP_CONFIG.optionCount,
+      min: line.min,
+      max: line.max,
+      spread: FROG_JUMP_CONFIG.optionSpread,
+    }).sort((a, b) => a - b);
+    problem = { ...rolled, options };
+    attempts++;
+  } while (isSame(problem, previous) && attempts < 20);
+  return problem;
 }

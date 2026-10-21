@@ -1,57 +1,79 @@
 "use client";
 import AnswerOptions from "@/app/components/AnswerOptions";
+import Container from "@/app/components/Container";
 import FeedbackMessage from "@/app/components/FeedbackMessage";
-import ScorePrompt from "@/app/components/ScorePrompt";
-import { FROG_JUMP_CONFIG } from "../constants/config";
+import GameHeader from "@/app/components/GameHeader";
+import GameIntro from "@/app/components/GameIntro";
+import HowToPlay from "@/app/components/HowToPlay";
+import StarMeter from "@/app/components/StarMeter";
+import { useDifficulty } from "@/app/hooks/useDifficulty";
+import { FROG_JUMP_HOW_TO_PLAY } from "../constants/howToPlay";
 import { useFrogJumpGame } from "../hooks/useFrogJumpGame";
-import { getNumberLinePosition } from "../utils/getNumberLinePosition";
-import FrogCharacter from "./FrogCharacter";
+import FrogPond from "./FrogPond";
 import NumberLine from "./NumberLine";
 import ProblemDisplay from "./ProblemDisplay";
 
-const getPosition = (value: number) =>
-  getNumberLinePosition(
-    value,
-    FROG_JUMP_CONFIG.max,
-    FROG_JUMP_CONFIG.lineWidthRatio
-  );
-
 export default function FrogJumpGame() {
-  const { problem, selection, feedback, isAnimating, score, selectOption } =
-    useFrogJumpGame();
-  const frogValue =
-    problem && isAnimating && feedback ? problem.answer : problem?.start;
+  const game = useFrogJumpGame();
+  const [difficulty, setDifficulty] = useDifficulty("frog-jump");
+
+  if (!game.difficulty || !game.problem) {
+    return (
+      <GameIntro
+        hero={<FrogPond />}
+        title="Frog Jump"
+        blurb="Help the frog hop from pad to pad. Read the jump, work out where it lands, then tap the number!"
+        howToPlay={<HowToPlay {...FROG_JUMP_HOW_TO_PLAY} />}
+        difficulty={difficulty}
+        onDifficultyChange={setDifficulty}
+        onStart={() => game.start(difficulty)}
+      />
+    );
+  }
+
+  const { problem, selected } = game;
+  const isAnswered = selected !== null;
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen bg-green-200 text-gray-700 overflow-hidden px-4">
-      {problem && (
+    <main className="flex-1 pt-24 pb-20 sm:pt-28">
+      <Container
+        size="md"
+        classes={{
+          container: "flex flex-col items-center gap-6 px-4 sm:px-10",
+        }}
+      >
+        <GameHeader
+          title="Frog Jump"
+          difficulty={game.difficulty}
+          onChangeDifficulty={game.quit}
+          meter={
+            <StarMeter
+              level={game.level}
+              stars={game.stars}
+              total={game.roundsPerLevel}
+              caption={`jumps up to ${game.maxJump}`}
+            />
+          }
+        />
         <ProblemDisplay
           start={problem.start}
           operation={problem.operation}
           jump={problem.jump}
         />
-      )}
-
-      <NumberLine max={FROG_JUMP_CONFIG.max} getPosition={getPosition}>
-        {frogValue !== undefined && (
-          <FrogCharacter left={getPosition(frogValue)} />
-        )}
-      </NumberLine>
-
-      <ScorePrompt
-        prompt="Click on the number where the frog lands!"
-        score={score}
-      />
-
-      <AnswerOptions
-        options={problem?.options ?? []}
-        onSelect={selectOption}
-        disabled={isAnimating || selection !== null}
-        selected={selection}
-        correctAnswer={problem?.answer}
-      />
-
-      <FeedbackMessage feedback={feedback} />
+        <NumberLine
+          line={game.settings.line}
+          start={problem.start}
+          landing={isAnswered ? problem.answer : null}
+        />
+        <AnswerOptions
+          options={problem.options}
+          onSelect={game.answer}
+          disabled={isAnswered}
+          selected={selected}
+          correctAnswer={problem.answer}
+        />
+        <FeedbackMessage feedback={game.feedback} />
+      </Container>
     </main>
   );
 }
