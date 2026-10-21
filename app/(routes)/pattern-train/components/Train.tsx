@@ -48,14 +48,21 @@ export function Train({ carriages, answer, solved }: TrainProps) {
   );
 }
 
+type TrainStationProps = TrainProps & {
+  trainId: number;
+  /** Called with `trainId` once that train has pulled in. */
+  onArrive: (trainId: number) => void;
+};
+
 /**
  * The track the trains run on. A new `trainId` sends the old train chuffing
  * off to the left before the next one pulls in from the right.
  */
 export default function TrainStation({
   trainId,
+  onArrive,
   ...train
-}: TrainProps & { trainId: number }) {
+}: TrainStationProps) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -72,6 +79,8 @@ export default function TrainStation({
               : { x: "-110%", transition: { duration: 0.8, ease: "easeIn" } }
           }
           transition={{ duration: 0.9, ease: "easeOut" }}
+          // Also fires as an old train leaves; its stale id is ignored.
+          onAnimationComplete={() => onArrive(trainId)}
         >
           <Train {...train} />
         </motion.div>

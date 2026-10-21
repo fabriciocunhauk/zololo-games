@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import type { Feedback } from "@/app/components/FeedbackMessage";
 import { MONSTERS, type Monster } from "@/app/components/monsters/monsters";
 import type { Difficulty } from "@/app/constants/difficulty";
@@ -7,6 +7,7 @@ import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
 import { randomInt } from "@/app/utils/randomInt";
 import { PATTERN_CONFIG, PATTERN_DIFFICULTY } from "../constants/config";
+import { revealText, rightText } from "../utils/feedbackText";
 import { generatePattern, type PatternRound } from "../utils/generatePattern";
 import { colourVariants, monsterResemblance } from "../utils/monsterFaces";
 
@@ -28,7 +29,7 @@ export function usePatternTrainGame() {
   const [round, setRound] = useState<PatternRound<Monster> | null>(null);
   /** Changes with every new train, so the old one can chuff away. */
   const [trainId, setTrainId] = useState(0);
-  /** The first wrong pick: taken off the options so the child tries another. */
+  /** The first wrong pick: stays in place, locked, so the child tries another. */
   const [tried, setTried] = useState<string | null>(null);
   /** The final pick (right, or the second miss). Locks the options. */
   const [selected, setSelected] = useState<Monster | null>(null);
@@ -72,10 +73,7 @@ export function usePatternTrainGame() {
       if (choice.name === round.answer.name) {
         setSelected(choice);
         const next = progress.recordCorrect();
-        const text = next.levelUp
-          ? "🎉 Choo choo! That's right! Level up: longer trains!"
-          : "🎉 Choo choo! That's right!";
-        setFeedback({ tone: "success", text });
+        setFeedback({ tone: "success", text: rightText(next) });
         schedule(
           () => startRound(difficulty, next.level),
           PATTERN_CONFIG.nextRoundDelayMs
@@ -96,19 +94,28 @@ export function usePatternTrainGame() {
       setSelected(choice);
       setFeedback({
         tone: "info",
-        text: `It was ${round.answer.name}! Here comes the next train.`,
+        text: revealText(round.answer, settings.faces),
       });
       schedule(
         () => startRound(difficulty, progress.level),
         PATTERN_CONFIG.revealHoldMs
       );
     },
-    [round, difficulty, selected, tried, progress, schedule, startRound]
+    [
+      round,
+      difficulty,
+      selected,
+      tried,
+      settings,
+      progress,
+      schedule,
+      startRound,
+    ]
   );
 
-  const options = useMemo(
-    () => round?.options.filter((option) => option.name !== tried) ?? [],
-    [round, tried]
+  const isTried = useCallback(
+    (option: Monster) => option.name === tried,
+    [tried]
   );
 
   return {
@@ -119,8 +126,10 @@ export function usePatternTrainGame() {
     roundsPerLevel: progress.roundsPerLevel,
     round,
     trainId,
-    options,
-    selected,
+    options: round?.options ?? [],
+    isTried,
+    /** The final pick, or the first miss so it stays ringed pink. */
+    selected: selected ?? round?.options.find(isTried) ?? null,
     /** The gap shows its monster once the round is over. */
     solved: selected !== null,
     feedback,

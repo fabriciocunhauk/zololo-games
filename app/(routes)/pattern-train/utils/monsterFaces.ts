@@ -9,6 +9,11 @@ const COLOUR_NAMES: Record<MonsterColor, string> = {
   grape: "Purple",
 };
 
+/** The colour word for a monster, e.g. "Blue". */
+export function colourName(monster: Monster): string {
+  return COLOUR_NAMES[monster.color];
+}
+
 /** The same monster in every colour, named by colour (e.g. "Blue Pip"). */
 export function colourVariants(base: Monster): Monster[] {
   return (Object.keys(COLOUR_NAMES) as MonsterColor[]).map((color) => ({

@@ -23,6 +23,10 @@ const answerOptions = (page: Page) =>
     .getByRole("group", { name: "Who rides in the empty carriage?" })
     .getByRole("button");
 
+/** Options that can still be picked (locked ones stay on screen, aria-disabled). */
+const openOptions = (page: Page) =>
+  answerOptions(page).and(page.locator(':not([aria-disabled="true"])'));
+
 test("intro explains the game and offers three difficulties", async ({
   page,
 }) => {
@@ -65,6 +69,8 @@ test("hard starts with a seven-carriage train and four options", async ({
 
 test("picking any option gives feedback", async ({ page }) => {
   await start(page);
+  // The options unlock once the train has pulled in.
+  await expect(answerOptions(page).first()).toBeEnabled();
   await answerOptions(page).first().click();
   await expect(page.getByRole("status")).toHaveText(
     /Choo choo|Not quite/
@@ -81,16 +87,17 @@ test("a wrong pick can be retried, and the right one earns a star", async ({
     .filter({ hasText: "Choo choo! That's right!" });
   let solved = false;
 
-  // The rule is never in the DOM, so try options in turn. A first miss takes
-  // that option away and leaves the rest enabled; a second miss reveals the
-  // answer and brings a new train.
+  // The rule is never in the DOM, so try options in turn. A first miss locks
+  // that option in place and leaves the rest enabled; a second miss reveals
+  // the answer and brings a new train, whose options wait until it arrives.
   for (let attempt = 0; attempt < 40 && !solved; attempt++) {
-    const option = answerOptions(page).first();
+    const option = openOptions(page).first();
     await expect(option).toBeEnabled({ timeout: 10_000 });
     const name = (await option.getAttribute("aria-label"))!;
     await option.click();
 
-    // Either the miss took that option away, or the round ended and locked the options.
+    // Either the miss locked that option, or the round ended and locked them all
+    // (or already brought the next train).
     const picked = answerOptions(page).and(
       page.getByRole("button", { name, exact: true })
     );

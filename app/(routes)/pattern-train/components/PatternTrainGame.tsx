@@ -1,4 +1,6 @@
 "use client";
+import { useReducedMotion } from "framer-motion";
+import { useState } from "react";
 import AnswerOptions from "@/app/components/AnswerOptions";
 import Container from "@/app/components/Container";
 import FeedbackMessage from "@/app/components/FeedbackMessage";
@@ -23,6 +25,9 @@ const renderMonster = (monster: Monster) => (
 export default function PatternTrainGame() {
   const game = usePatternTrainGame();
   const [difficulty, setDifficulty] = useDifficulty("pattern-train");
+  const reduceMotion = useReducedMotion();
+  /** The last train to pull in. Until the current one has, the options wait. */
+  const [arrivedTrain, setArrivedTrain] = useState(0);
 
   if (!game.difficulty || !game.round) {
     return (
@@ -39,6 +44,7 @@ export default function PatternTrainGame() {
   }
 
   const { round } = game;
+  const boarding = !reduceMotion && arrivedTrain !== game.trainId;
 
   return (
     <main className="flex-1 pt-24 pb-20 sm:pt-28">
@@ -67,11 +73,9 @@ export default function PatternTrainGame() {
           carriages={round.carriages}
           answer={round.answer}
           solved={game.solved}
+          onArrive={setArrivedTrain}
         />
-        <p
-          id="pattern-question"
-          className="text-center font-display text-2xl sm:text-3xl"
-        >
+        <p className="text-center font-display text-2xl sm:text-3xl">
           Who rides in the{" "}
           <span
             aria-hidden
@@ -81,22 +85,18 @@ export default function PatternTrainGame() {
           </span>
           <span className="sr-only">empty</span> carriage?
         </p>
-        <div
-          role="group"
-          aria-labelledby="pattern-question"
-          className="flex w-full justify-center"
-        >
-          <AnswerOptions
-            options={game.options}
-            onSelect={game.answer}
-            disabled={game.solved}
-            selected={game.selected}
-            correctAnswer={round.answer}
-            optionKey={monsterName}
-            optionLabel={monsterName}
-            renderOption={renderMonster}
-          />
-        </div>
+        <AnswerOptions
+          label="Who rides in the empty carriage?"
+          options={game.options}
+          onSelect={game.answer}
+          disabled={game.solved || boarding}
+          isOptionDisabled={game.isTried}
+          selected={game.selected}
+          correctAnswer={round.answer}
+          optionKey={monsterName}
+          optionLabel={monsterName}
+          renderOption={renderMonster}
+        />
         <FeedbackMessage feedback={game.feedback} />
       </Container>
     </main>
