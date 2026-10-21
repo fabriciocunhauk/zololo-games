@@ -159,7 +159,7 @@ const pt: Messages = {
     games: "Jogos",
     grownUps: "Para os adultos",
     grownUpsText:
-      "Todo jogo tem três níveis. Escolha o que combina com a criança, jogue junto e converse sobre o que vocês veem.",
+      "Todos os jogos têm três níveis. Escolha o que combina com a criança, jogue junto e converse sobre o que vocês veem.",
     backToTop: "Voltar ao topo ↑",
   },
   games: {

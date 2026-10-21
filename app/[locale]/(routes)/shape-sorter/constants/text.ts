@@ -134,7 +134,7 @@ const pt: ShapeText = {
       "Toque na caixa onde ela deve ir. Caixa errada? Ela balança, então tente outra!",
       "Separe 10 formas para terminar uma rodada e ganhar uma estrela. Com 3 estrelas, você sobe de nível!",
     ],
-    tip: "toda rodada que você termina vale uma estrela, mesmo que algumas formas precisem de uma segunda tentativa. No Fácil você separa por cor, no Médio por formato e no Difícil pelo número de lados.",
+    tip: "todas as rodadas que você terminar valem uma estrela, mesmo que algumas formas precisem de uma segunda tentativa. No Fácil você separa por cor, no Médio por formato e no Difícil pelo número de lados.",
   },
   question: {
     colour: "De que cor ela é?",
