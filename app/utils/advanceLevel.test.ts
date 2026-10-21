@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { advanceLevel } from "./advanceLevel";
+import { advanceLevel, clampLevel } from "./advanceLevel";
 
 const rules = { levelCount: 3, roundsPerLevel: 5 };
 
@@ -26,5 +26,13 @@ describe("advanceLevel", () => {
       stars: 0,
       levelUp: false,
     });
+  });
+});
+
+describe("clampLevel", () => {
+  it("keeps a level inside a shorter difficulty", () => {
+    expect(clampLevel(2, 2)).toBe(1);
+    expect(clampLevel(1, 3)).toBe(1);
+    expect(clampLevel(0, 1)).toBe(0);
   });
 });

@@ -22,3 +22,12 @@ export function advanceLevel(
   const levelUp = level < levelCount - 1;
   return { level: levelUp ? level + 1 : level, stars: 0, levelUp };
 }
+
+/**
+ * A stored level that fits the current rules. A game can switch to a
+ * difficulty with fewer levels (e.g. after "Change difficulty") before its
+ * progress is reset; reading past the end would crash.
+ */
+export function clampLevel(level: number, levelCount: number): number {
+  return Math.max(0, Math.min(level, levelCount - 1));
+}
