@@ -1,8 +1,8 @@
-import Image, { type StaticImageData } from "next/image";
+import AnimalArt, { type AnimalKind } from "@/app/components/animals/AnimalArt";
 import { classNames } from "@/app/utils/appearance";
 
 type AnimalTileProps = {
-  image: StaticImageData;
+  kind: AnimalKind;
   /** The number this animal was counted as, if it has been counted. */
   count?: number;
   className?: string;
@@ -10,7 +10,7 @@ type AnimalTileProps = {
 
 /** An animal on a white tile; counted animals turn yellow and wear their number. */
 export default function AnimalTile({
-  image,
+  kind,
   count,
   className,
 }: AnimalTileProps) {
@@ -24,7 +24,7 @@ export default function AnimalTile({
         className
       )}
     >
-      <Image src={image} alt="" className="w-3/5 h-auto drop-shadow-sm" />
+      <AnimalArt kind={kind} className="w-3/5 h-auto" />
       {isCounted && (
         <span
           aria-hidden

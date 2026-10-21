@@ -10,8 +10,8 @@ const steps: ReadonlyArray<HowToPlayStep> = [
     text: "Look at the question. Which animal do you need to count?",
     picture: (
       <>
-        <AnimalTile image={duck.image} className={mini} />
-        <AnimalTile image={duck.image} className={mini} />
+        <AnimalTile kind={duck.kind} className={mini} />
+        <AnimalTile kind={duck.kind} className={mini} />
       </>
     ),
   },
@@ -19,8 +19,8 @@ const steps: ReadonlyArray<HowToPlayStep> = [
     text: "Tap each animal once to count it: 1, 2, 3… Each one gets its number.",
     picture: (
       <>
-        <AnimalTile image={duck.image} count={1} className={mini} />
-        <AnimalTile image={duck.image} count={2} className={mini} />
+        <AnimalTile kind={duck.kind} count={1} className={mini} />
+        <AnimalTile kind={duck.kind} count={2} className={mini} />
       </>
     ),
   },

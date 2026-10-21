@@ -1,4 +1,4 @@
-import Image from "next/image";
+import AnimalArt from "@/app/components/animals/AnimalArt";
 import type { Animal } from "../constants/animals";
 
 type CountingQuestionProps = {
@@ -20,7 +20,7 @@ export default function CountingQuestion({
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <div className="flex items-center gap-3">
-        <Image src={animal.image} alt="" className="w-10 sm:w-12 h-auto" />
+        <AnimalArt kind={animal.kind} className="w-10 sm:w-12 h-auto" />
         <h2
           data-testid="question"
           className="font-display text-3xl sm:text-5xl"

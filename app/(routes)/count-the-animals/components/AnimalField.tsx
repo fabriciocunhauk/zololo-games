@@ -37,7 +37,7 @@ export default function AnimalField({
             onClick={() => onCount(position)}
             className="rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-2 disabled:cursor-default enabled:motion-safe:active:translate-y-[3px] transition-transform"
           >
-            <AnimalTile image={animal.image} count={count} />
+            <AnimalTile kind={animal.kind} count={count} />
           </button>
         );
       })}
