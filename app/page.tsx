@@ -23,7 +23,6 @@ export default function Home() {
               <GameCard
                 game={game}
                 tilt={idx % 2 === 0 ? "left" : "right"}
-                priority={idx === 0}
               />
             </li>
           ))}

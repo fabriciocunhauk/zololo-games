@@ -257,16 +257,34 @@ export default function MonsterArt({
   monster,
   className,
   style,
+  x,
+  y,
+  width,
+  height,
 }: {
   monster: Monster;
   className?: string;
   style?: CSSProperties;
+  /** Position and size, for nesting inside another SVG. */
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
 }) {
   const body = BODIES[monster.body];
   const mouthY = body.eyeY + body.mouthGap;
 
   return (
-    <svg viewBox="0 0 100 100" aria-hidden className={className} style={style}>
+    <svg
+      viewBox="0 0 100 100"
+      aria-hidden
+      className={className}
+      style={style}
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+    >
       <ellipse
         cx={50}
         cy={93}

@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import type { Game } from "@/app/constants/games";
 import { classNames } from "@/app/utils/appearance";
@@ -7,10 +6,10 @@ import { classNames } from "@/app/utils/appearance";
 type GameCardProps = {
   game: Game;
   tilt: "left" | "right";
-  priority?: boolean;
 };
 
-export default function GameCard({ game, tilt, priority }: GameCardProps) {
+export default function GameCard({ game, tilt }: GameCardProps) {
+  const { Art } = game;
   const style: CSSProperties & { "--tile": string } = { "--tile": game.tile };
 
   return (
@@ -26,13 +25,7 @@ export default function GameCard({ game, tilt, priority }: GameCardProps) {
         {game.skill}
       </span>
       <span className="flex flex-1 items-center justify-center py-3 sm:py-5">
-        <Image
-          src={game.image}
-          alt=""
-          height={112}
-          priority={priority}
-          className="h-20 sm:h-28 w-auto object-contain drop-shadow-md motion-safe:transition-transform motion-safe:group-hover:scale-105"
-        />
+        <Art className="h-24 sm:h-32 w-auto motion-safe:transition-transform motion-safe:group-hover:scale-105" />
       </span>
       <span className="font-display text-2xl leading-tight">{game.name}</span>
     </Link>
