@@ -33,3 +33,8 @@ export function generateMathProblem(settings: BubblePopSettings): MathProblem {
 
   return { text: `${a} ${op} ${b} = ?`, answer, options };
 }
+
+/** The sum with its answer filled in, e.g. "3 + 4 = 7". */
+export function solveText({ text, answer }: MathProblem): string {
+  return text.replace("?", String(answer));
+}

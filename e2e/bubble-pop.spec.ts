@@ -22,8 +22,12 @@ test("start, pop the right bubble, reset and change difficulty", async ({
     exact: true,
   });
   await expect(bubble).toBeEnabled();
-  // Bubbles never stop moving, so skip Playwright's stability wait.
-  await bubble.dispatchEvent("click");
+  // Bubbles never stop moving, so skip Playwright's stability wait. A
+  // double-tap scores once: the second tap lands on a leaving bubble.
+  await bubble.evaluate((el: HTMLElement) => {
+    el.click();
+    el.click();
+  });
 
   await expect(page.getByRole("status")).toHaveText("🎉 Correct!");
   await expect(page.getByTestId("score")).toHaveText("10");

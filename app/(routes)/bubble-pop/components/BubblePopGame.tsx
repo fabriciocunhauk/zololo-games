@@ -60,11 +60,11 @@ export default function BubblePopGame() {
         <MathProblem problem={game.problem} roundId={game.roundId} />
         <BubbleField
           bubbles={game.bubbles}
+          count={game.bubbleCount}
           roundId={game.roundId}
           poppedId={game.poppedId}
           disabled={game.isLocked}
           onPop={game.popBubble}
-          areaRef={game.areaRef}
         />
         <FeedbackMessage feedback={game.feedback} />
       </Container>

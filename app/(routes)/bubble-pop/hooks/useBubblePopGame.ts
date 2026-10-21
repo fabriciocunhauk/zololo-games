@@ -8,9 +8,9 @@ import { BUBBLE_POP_CONFIG, BUBBLE_POP_DIFFICULTY } from "../constants/config";
 import { createBubbles, type Bubble } from "../utils/createBubbles";
 import {
   generateMathProblem,
+  solveText,
   type MathProblem,
 } from "../utils/generateMathProblem";
-import { getBubbleSize } from "../utils/getBubbleSize";
 
 const { levelRiseScale } = BUBBLE_POP_CONFIG;
 
@@ -26,8 +26,14 @@ export function useBubblePopGame() {
   const [score, setScore] = useState(0);
   /** Taps are ignored while bubbles set off, during feedback and the countdown. */
   const [isLocked, setIsLocked] = useState(true);
-  const areaRef = useRef<HTMLDivElement>(null);
+  // Read by taps: leaving bubbles keep a stale `isLocked` while they fade.
+  const lockedRef = useRef(true);
   const { schedule, clearAll } = useSafeTimeout();
+
+  const lock = useCallback((locked: boolean) => {
+    lockedRef.current = locked;
+    setIsLocked(locked);
+  }, []);
 
   const progress = useLevelProgress({
     levelCount: levelRiseScale.length,
@@ -36,25 +42,20 @@ export function useBubblePopGame() {
 
   const startRound = useCallback(
     (forDifficulty: Difficulty, forLevel: number) => {
-      const { fallbackAreaSize, bubbleStaggerMs, roundSettleMs } =
-        BUBBLE_POP_CONFIG;
+      const { bubbleStaggerMs, roundSettleMs } = BUBBLE_POP_CONFIG;
       const settings = BUBBLE_POP_DIFFICULTY[forDifficulty];
       const scale = levelRiseScale[forLevel];
       const next = generateMathProblem(settings);
-      const area = areaRef.current;
 
       setRoundId((id) => id + 1);
       setProblem(next);
       setFeedback(null);
       setPoppedId(null);
-      setIsLocked(true);
+      lock(true);
       setBubbles(
         createBubbles({
           values: next.options,
           answer: next.answer,
-          areaWidth: area?.clientWidth || fallbackAreaSize,
-          areaHeight: area?.clientHeight || fallbackAreaSize,
-          bubbleSize: getBubbleSize(window.innerWidth),
           riseSeconds: {
             min: settings.riseSeconds.min * scale,
             max: settings.riseSeconds.max * scale,
@@ -63,11 +64,11 @@ export function useBubblePopGame() {
         })
       );
       schedule(
-        () => setIsLocked(false),
+        () => lock(false),
         next.options.length * bubbleStaggerMs + roundSettleMs
       );
     },
-    [schedule]
+    [lock, schedule]
   );
 
   /** Clears the board and counts 3-2-1-GO, then starts at level 1. */
@@ -80,7 +81,7 @@ export function useBubblePopGame() {
       setProblem(null);
       setBubbles([]);
       setFeedback(null);
-      setIsLocked(true);
+      lock(true);
       setCountdown(countdownFrom);
       for (let n = countdownFrom - 1; n >= 0; n--) {
         schedule(() => setCountdown(n), (countdownFrom - n) * countdownStepMs);
@@ -90,7 +91,7 @@ export function useBubblePopGame() {
         startRound(forDifficulty, 0);
       }, countdownFrom * countdownStepMs + goHoldMs);
     },
-    [clearAll, progress, schedule, startRound]
+    [clearAll, lock, progress, schedule, startRound]
   );
 
   const start = useCallback(
@@ -107,17 +108,18 @@ export function useBubblePopGame() {
 
   const quit = useCallback(() => {
     clearAll();
+    lock(true);
     setDifficulty(null);
     setCountdown(null);
     setProblem(null);
     setBubbles([]);
     setFeedback(null);
-  }, [clearAll]);
+  }, [clearAll, lock]);
 
   const popBubble = useCallback(
     (bubble: Bubble) => {
-      if (isLocked || !difficulty) return;
-      setIsLocked(true);
+      if (lockedRef.current || !difficulty || !problem) return;
+      lock(true);
       setPoppedId(bubble.id);
       setBubbles([]);
 
@@ -128,7 +130,9 @@ export function useBubblePopGame() {
           tone: "success",
           text: next.levelUp
             ? "🎉 Correct! Level up: the bubbles float faster now!"
-            : "🎉 Correct!",
+            : next.stars === 0
+              ? "🎉 Correct! Another row of stars!"
+              : "🎉 Correct!",
         });
         schedule(
           () => startRound(difficulty, next.level),
@@ -137,13 +141,17 @@ export function useBubblePopGame() {
         return;
       }
 
-      setFeedback({ tone: "error", text: "Oops! Try again." });
+      // Wrong: say the answer before the next sum floats in.
+      setFeedback({
+        tone: "error",
+        text: `Not quite! ${solveText(problem)}.`,
+      });
       schedule(
         () => startRound(difficulty, progress.level),
-        BUBBLE_POP_CONFIG.nextRoundDelayMs
+        BUBBLE_POP_CONFIG.wrongHoldMs
       );
     },
-    [isLocked, difficulty, progress, schedule, startRound]
+    [difficulty, problem, lock, progress, schedule, startRound]
   );
 
   return {
@@ -155,11 +163,11 @@ export function useBubblePopGame() {
     score,
     roundId,
     problem: problem?.text ?? null,
+    bubbleCount: difficulty ? BUBBLE_POP_DIFFICULTY[difficulty].bubbleCount : 0,
     bubbles,
     poppedId,
     feedback,
     isLocked,
-    areaRef,
     start,
     restart,
     quit,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { BUBBLE_POP_DIFFICULTY } from "../constants/config";
-import { generateMathProblem } from "./generateMathProblem";
+import { generateMathProblem, solveText } from "./generateMathProblem";
 
 const difficulties = Object.entries(BUBBLE_POP_DIFFICULTY);
 
@@ -44,4 +44,16 @@ describe("generateMathProblem", () => {
       expect(optionSpread).toBeGreaterThanOrEqual(bubbleCount - 1);
     }
   );
+
+  it("fills in the answer for feedback", () => {
+    expect(solveText({ text: "3 + 4 = ?", answer: 7, options: [7] })).toBe(
+      "3 + 4 = 7"
+    );
+    for (let i = 0; i < 100; i++) {
+      const problem = generateMathProblem(BUBBLE_POP_DIFFICULTY.hard);
+      const solved = solveText(problem);
+      expect(solved).toMatch(/^\d+ [+-] \d+ = \d+$/);
+      expect(solved.endsWith(`= ${problem.answer}`)).toBe(true);
+    }
+  });
 });

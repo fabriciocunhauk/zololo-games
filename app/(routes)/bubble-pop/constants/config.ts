@@ -69,5 +69,6 @@ export const BUBBLE_POP_CONFIG = Object.freeze({
   /** Extra pause after the last bubble sets off before taps count. */
   roundSettleMs: 500,
   nextRoundDelayMs: 1500,
-  fallbackAreaSize: 400,
+  /** Longer after a wrong pop, to read the answer. */
+  wrongHoldMs: 2600,
 });
