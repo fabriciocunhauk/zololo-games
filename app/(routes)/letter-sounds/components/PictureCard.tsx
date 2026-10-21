@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import type { PictureWord } from "../constants/words";
 
 type PictureCardProps = {
@@ -7,13 +6,6 @@ type PictureCardProps = {
   wordDisplay: "blanked" | "hidden";
   /** After answering: the whole word, first letter highlighted. */
   revealed: boolean;
-  canSpeak: boolean;
-  onHear: () => void;
-};
-
-const hearStyle: CSSProperties & { "--tile": string; "--depth": string } = {
-  "--tile": "var(--color-sky)",
-  "--depth": "5px",
 };
 
 function WordLine({
@@ -42,13 +34,11 @@ function WordLine({
   return null;
 }
 
-/** The big picture to name, with its word underneath and a "Hear it" button. */
+/** The big picture to name, with its word underneath. */
 export default function PictureCard({
   word,
   wordDisplay,
   revealed,
-  canSpeak,
-  onHear,
 }: PictureCardProps) {
   return (
     <div
@@ -70,16 +60,6 @@ export default function PictureCard({
           revealed={revealed}
         />
       </div>
-      {canSpeak && (
-        <button
-          type="button"
-          onClick={onHear}
-          style={hearStyle}
-          className="toy-block flex min-h-12 items-center gap-2 px-5 py-2 text-lg font-bold"
-        >
-          <span aria-hidden>🔊</span> Hear it
-        </button>
-      )}
     </div>
   );
 }

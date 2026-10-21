@@ -6,14 +6,11 @@ const miniCard =
 
 const steps: ReadonlyArray<HowToPlayStep> = [
   {
-    text: "Look at the picture and say its name. Tap “Hear it” to listen.",
+    text: "Look at the picture and say its name out loud.",
     picture: (
       <>
         <span aria-hidden className={miniCard}>
           🍎
-        </span>
-        <span aria-hidden className="text-2xl">
-          🔊
         </span>
       </>
     ),

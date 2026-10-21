@@ -1,8 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Speech is optional: Playwright's Chromium may have no voices, so nothing
-// here listens for audio or depends on the "Hear it" button.
-
 async function openIntro(page: Page) {
   await page.goto("/letter-sounds");
   await expect(page).toHaveTitle("Letter Sounds · Zololo Games");

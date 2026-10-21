@@ -36,7 +36,7 @@ export const LETTER_DIFFICULTY: Readonly<Record<Difficulty, LetterSettings>> =
       letterCase: "lower",
       showWord: false,
       optionCount: 4,
-      caption: "listen & pick",
+      caption: "name & pick",
     },
     hard: {
       mode: "spell",
@@ -49,7 +49,7 @@ export const LETTER_CONFIG = Object.freeze({
   roundsPerLevel: 5,
   levelCount: 5,
   nextRoundDelayMs: 2400,
-  /** After a wrong letter: "Listen again…", then say the answer, then move on. */
+  /** After a wrong letter: "Say the word slowly…", then show the answer, then move on. */
   revealLeadMs: 1500,
   revealHoldMs: 2400,
 });

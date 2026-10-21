@@ -26,7 +26,7 @@ export default function LetterSoundsGame() {
       <GameIntro
         hero={<LetterBlocksHero />}
         title={TITLE}
-        blurb="Apple, ball, cat… Look at the picture, listen to the word and find the letter it starts with!"
+        blurb="Apple, ball, cat… Look at the picture, say its name and find the letter it starts with!"
         howToPlay={<HowToPlay {...LETTER_HOW_TO_PLAY} />}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
@@ -74,8 +74,6 @@ export default function LetterSoundsGame() {
               : "hidden"
           }
           revealed={isChoose && game.locked}
-          canSpeak={game.canSpeak}
-          onHear={game.hear}
         />
         {round.kind === "choose" ? (
           <AnswerOptions

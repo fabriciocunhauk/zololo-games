@@ -4,7 +4,6 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
-import { useSpeak } from "@/app/hooks/useSpeak";
 import { LETTER_CONFIG, LETTER_DIFFICULTY } from "../constants/config";
 import { PICTURE_WORDS } from "../constants/words";
 import { checkSpellingTap } from "../utils/checkSpelling";
@@ -17,7 +16,7 @@ import { capitalise, firstLetter } from "../utils/letters";
 /** A wrong bank tile to wiggle; `nonce` changes so the same tile can wiggle again. */
 export type Shake = { tile: number; nonce: number };
 
-const LISTEN_AGAIN = "Not quite! Listen again…";
+const TRY_AGAIN = "Not quite! Say the word slowly…";
 
 function cheer(levelUp: boolean, fullRow: boolean) {
   if (levelUp) return " Level up!";
@@ -39,7 +38,6 @@ export function useLetterSoundsGame() {
   const [shake, setShake] = useState<Shake | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const { schedule, clearAll } = useSafeTimeout();
-  const { canSpeak, speak } = useSpeak();
 
   const progress = useLevelProgress({
     levelCount: LETTER_CONFIG.levelCount,
@@ -61,9 +59,8 @@ export function useLetterSoundsGame() {
       setMistakes(0);
       setShake(null);
       setFeedback(null);
-      speak(next.word.word);
     },
-    [speak]
+    []
   );
 
   const start = useCallback(
@@ -82,10 +79,6 @@ export function useLetterSoundsGame() {
     setRound(null);
   }, [clearAll]);
 
-  const hear = useCallback(() => {
-    if (round) speak(round.word.word);
-  }, [round, speak]);
-
   const answer = useCallback(
     (choice: string) => {
       if (!round || round.kind !== "choose" || !difficulty || locked) return;
@@ -99,23 +92,20 @@ export function useLetterSoundsGame() {
         const next = progress.recordCorrect();
         const extra = cheer(next.levelUp, next.stars === 0);
         setFeedback({ tone: "success", text: `🎉 Yes! ${sentence}!${extra}` });
-        speak(`Yes! ${sentence}!`);
         schedule(() => startRound(difficulty, word), nextRoundDelayMs);
         return;
       }
 
-      setFeedback({ tone: "error", text: LISTEN_AGAIN });
-      speak(word);
+      setFeedback({ tone: "error", text: TRY_AGAIN });
       schedule(() => {
         setFeedback({ tone: "info", text: `${sentence}.` });
-        speak(sentence);
       }, revealLeadMs);
       schedule(
         () => startRound(difficulty, word),
         revealLeadMs + revealHoldMs
       );
     },
-    [round, difficulty, locked, progress, speak, schedule, startRound]
+    [round, difficulty, locked, progress, schedule, startRound]
   );
 
   const pickTile = useCallback(
@@ -129,8 +119,7 @@ export function useLetterSoundsGame() {
       if (result === "wrong") {
         setMistakes((count) => count + 1);
         setShake((prev) => ({ tile, nonce: (prev?.nonce ?? 0) + 1 }));
-        setFeedback({ tone: "error", text: LISTEN_AGAIN });
-        speak(word);
+        setFeedback({ tone: "error", text: TRY_AGAIN });
         return;
       }
 
@@ -149,13 +138,11 @@ export function useLetterSoundsGame() {
           tone: "success",
           text: `🎉 Yes! You spelled ${word}!${extra}`,
         });
-        speak(`Yes! You spelled ${word}!`);
       } else {
         setFeedback({
           tone: "info",
           text: `You spelled ${word}! No slips next time for a star.`,
         });
-        speak(`You spelled ${word}!`);
       }
       schedule(
         () => startRound(difficulty, word),
@@ -170,7 +157,6 @@ export function useLetterSoundsGame() {
       placed,
       mistakes,
       progress,
-      speak,
       schedule,
       startRound,
     ]
@@ -188,10 +174,8 @@ export function useLetterSoundsGame() {
     usedTiles,
     shake,
     feedback,
-    canSpeak,
     start,
     quit,
-    hear,
     answer,
     pickTile,
   };
