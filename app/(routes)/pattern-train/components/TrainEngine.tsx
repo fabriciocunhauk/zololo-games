@@ -11,15 +11,8 @@ const PUFFS = [0, 1, 2];
 function Steam() {
   const reduceMotion = useReducedMotion();
 
-  if (reduceMotion) {
-    return (
-      <g className={classNames(INK, "fill-white")} strokeWidth={2.5}>
-        <circle cx={40} cy={10} r={6} />
-        <circle cx={52} cy={4} r={4.5} />
-      </g>
-    );
-  }
-
+  // Same elements either way: the server can't know the motion setting, so
+  // switching markup on it would break hydration.
   return (
     <g className={classNames(INK, "fill-white")} strokeWidth={2.5}>
       {PUFFS.map((idx) => (
@@ -30,18 +23,26 @@ function Steam() {
           r={6}
           style={{ transformBox: "fill-box", transformOrigin: "center" }}
           initial={{ opacity: 0 }}
-          animate={{
-            x: [0, 10, 18],
-            y: [0, -10, -18],
-            scale: [0.5, 1, 1.3],
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: 1.8,
-            repeat: Infinity,
-            ease: "easeOut",
-            delay: idx * 0.6,
-          }}
+          animate={
+            reduceMotion
+              ? { x: idx * 8, y: idx * -8, scale: 1 - idx * 0.2, opacity: 1 }
+              : {
+                  x: [0, 10, 18],
+                  y: [0, -10, -18],
+                  scale: [0.5, 1, 1.3],
+                  opacity: [0, 1, 0],
+                }
+          }
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : {
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: "easeOut",
+                  delay: idx * 0.6,
+                }
+          }
         />
       ))}
     </g>
