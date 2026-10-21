@@ -51,9 +51,12 @@ export default async function RootLayout({ children, params }: LayoutProps) {
   if (!isLocale(locale)) notFound();
 
   return (
+    // Browser extensions (e.g. LanguageTool) add attributes to <html> before
+    // React loads; only this element's attributes are exempt from the check.
     <html
       lang={HTML_LANG[locale]}
       className={`${displayFont.variable} ${bodyFont.variable}`}
+      suppressHydrationWarning
     >
       <body className="relative flex min-h-screen flex-col bg-paper font-sans text-ink antialiased">
         <LocaleProvider locale={locale}>
