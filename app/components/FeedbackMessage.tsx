@@ -8,9 +8,9 @@ export type Feedback = {
 };
 
 const toneClasses: Record<Feedback["tone"], string> = {
-  success: "bg-green-200 text-green-800 border-green-400",
-  error: "bg-red-200 text-red-800 border-red-400",
-  info: "bg-sky/40 text-ink border-sky",
+  success: "bg-leaf/50",
+  error: "bg-pink-primary/50",
+  info: "bg-sky/50",
 };
 
 export default function FeedbackMessage({
@@ -29,7 +29,7 @@ export default function FeedbackMessage({
           exit={{ opacity: 0, y: -30, scale: 0.8 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
           className={classNames(
-            "mt-4 sm:mt-8 p-2 sm:p-3 rounded-xl border-4 text-base sm:text-xl md:text-2xl font-bold shadow-lg text-center",
+            "mt-4 sm:mt-8 px-4 py-2 sm:py-3 rounded-2xl border-[3px] border-ink text-ink text-base sm:text-xl md:text-2xl font-bold shadow-[0_4px_0_var(--color-ink)] text-center",
             toneClasses[feedback.tone]
           )}
         >

@@ -1,6 +1,6 @@
 "use client";
 import { motion, useReducedMotion } from "framer-motion";
-import type { Monster } from "../constants/monsters";
+import type { Monster } from "@/app/components/monsters/monsters";
 import type { CardState } from "../hooks/useMemoryGame";
 import CardBack from "./CardBack";
 import CardFront from "./CardFront";

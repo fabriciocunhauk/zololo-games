@@ -1,7 +1,7 @@
 "use client";
 import { motion, useReducedMotion } from "framer-motion";
-import { MONSTERS } from "../constants/monsters";
-import MonsterArt from "./MonsterArt";
+import { MONSTERS } from "@/app/components/monsters/monsters";
+import MonsterArt from "@/app/components/monsters/MonsterArt";
 
 const PARADE = [
   MONSTERS[3],

@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { classNames } from "@/app/utils/appearance";
-import type { Monster, MonsterBody, MonsterColor } from "../constants/monsters";
+import type { Monster, MonsterBody, MonsterColor } from "./monsters";
 
 type BodyGeometry = {
   shape: ReactNode;

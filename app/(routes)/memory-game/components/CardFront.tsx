@@ -1,6 +1,6 @@
 import { classNames } from "@/app/utils/appearance";
-import type { Monster } from "../constants/monsters";
-import MonsterArt from "./MonsterArt";
+import type { Monster } from "@/app/components/monsters/monsters";
+import MonsterArt from "@/app/components/monsters/MonsterArt";
 
 /** Face-up side: the monster, its name when there's room, and a tick once matched. */
 export default function CardFront({

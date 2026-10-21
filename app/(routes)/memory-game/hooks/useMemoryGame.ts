@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
 import { MEMORY_CONFIG } from "../constants/config";
-import { MONSTERS, type Monster } from "../constants/monsters";
+import { MONSTERS, type Monster } from "@/app/components/monsters/monsters";
 import {
   createShuffledDeck,
   type MemoryCardData,

@@ -1,10 +1,10 @@
 import { classNames } from "@/app/utils/appearance";
-import type { Monster } from "../constants/monsters";
+import type { Monster } from "@/app/components/monsters/monsters";
 import type { CardState } from "../hooks/useMemoryGame";
 import type { MemoryCardData } from "../utils/createShuffledDeck";
 import { getBoardLayout } from "../utils/getBoardLayout";
 import MemoryCard from "./MemoryCard";
-import MonsterArt from "./MonsterArt";
+import MonsterArt from "@/app/components/monsters/MonsterArt";
 
 type MemoryBoardProps = {
   deck: ReadonlyArray<MemoryCardData<Monster>>;

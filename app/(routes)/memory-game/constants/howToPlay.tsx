@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { HowToPlayStep } from "@/app/components/HowToPlay";
 import CardBack from "../components/CardBack";
 import CardFront from "../components/CardFront";
-import { MONSTERS } from "./monsters";
+import { MONSTERS } from "@/app/components/monsters/monsters";
 
 const [pip, bop] = MONSTERS;
 
