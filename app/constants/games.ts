@@ -4,6 +4,7 @@ import animalsImage from "@/public/images/animals/duck.png";
 import frogImage from "@/public/images/frog-jump/frog.svg";
 import bubblesImage from "@/public/images/bubble-pop/bubbles.svg";
 import letterSoundsImage from "@/public/images/letter-sounds/letter-sounds.svg";
+import shapeSorterImage from "@/public/images/shape-sorter/shape-sorter.svg";
 import oddOneOutImage from "@/public/images/odd-one-out/odd-one-out.svg";
 
 export type Game = {
@@ -58,5 +59,12 @@ export const GAMES: ReadonlyArray<Game> = Object.freeze([
     image: letterSoundsImage,
     skill: "Phonics",
     tile: "var(--color-tangerine)",
+  },
+  {
+    name: "Shape Sorter",
+    href: "/shape-sorter",
+    image: shapeSorterImage,
+    skill: "Shapes",
+    tile: "var(--color-sky)",
   },
 ]);
