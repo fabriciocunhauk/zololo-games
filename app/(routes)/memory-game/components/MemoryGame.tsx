@@ -29,6 +29,16 @@ export default function MemoryGame() {
     );
   }
 
+  const nextStep = game.isLastLevel
+    ? "That was the last level! Here comes a fresh set of cards…"
+    : `Get ready for level ${game.level + 1}…`;
+  const live = game.gameWon
+    ? { text: `You found every pair! ${nextStep}`, key: "won" }
+    : game.announcement && {
+        text: game.announcement.text,
+        key: String(game.announcement.nonce),
+      };
+
   return (
     <main className="flex-1 pt-24 pb-20 sm:pt-28">
       <Container
@@ -50,7 +60,12 @@ export default function MemoryGame() {
             </>
           }
           actions={
-            <HeaderButton onClick={game.restartLevel}>Restart level</HeaderButton>
+            // Hidden while celebrating: the next level is already on its way.
+            !game.gameWon && (
+              <HeaderButton onClick={game.restartLevel}>
+                Restart level
+              </HeaderButton>
+            )
           }
           howToPlay={<HowToPlay {...MEMORY_HOW_TO_PLAY} />}
         />
@@ -64,13 +79,14 @@ export default function MemoryGame() {
             cardState={game.cardState}
             onFlip={game.flipCard}
             gameWon={game.gameWon}
-            nextStep={
-              game.isLastLevel
-                ? "That was the last level! Here comes a fresh set of cards…"
-                : `Get ready for level ${game.level + 1}…`
-            }
+            nextStep={nextStep}
           />
         )}
+        {/* One live region for matches and the win, mounted all game so
+            every message is read. Keyed so a repeat is read again. */}
+        <p role="status" className="sr-only">
+          {live && <span key={live.key}>{live.text}</span>}
+        </p>
       </Container>
     </main>
   );

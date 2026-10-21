@@ -38,7 +38,8 @@ test("level 1 deals four cards and flipping two counts a move", async ({
 test("matching every pair levels up to a bigger deck", async ({ page }) => {
   await start(page);
   const card = (pos: number) => page.locator("[data-state]").nth(pos);
-  const won = page.getByText("You found every pair!");
+  // The panel's heading; the live region says it too, without the emoji.
+  const won = page.getByText("You found every pair! 🎉");
 
   // Level 1 has 4 cards: trying each pair of face-down cards always solves it.
   for (let a = 0; a < 4; a++) {
@@ -48,14 +49,26 @@ test("matching every pair levels up to a bigger deck", async ({ page }) => {
       if ((await card(b).getAttribute("data-state")) !== "down") continue;
       await card(a).click();
       await card(b).click();
+      await expect(page.getByRole("status")).toHaveText(
+        /^(It's a match!|Not a match\. They flip back\.)$/
+      );
       await expect(page.locator('[data-state="up"]')).toHaveCount(0);
     }
   }
 
   await expect(won).toBeVisible();
-  await expect(page.getByText("Get ready for level 2…")).toBeVisible();
+  await expect(
+    page.getByText("Get ready for level 2…", { exact: true })
+  ).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText(
+    "You found every pair! Get ready for level 2…"
+  );
+  await expect(
+    page.getByRole("button", { name: "Restart level" })
+  ).toHaveCount(0);
   await expect(page.getByTestId("level")).toHaveText("2", { timeout: 5000 });
   await expect(page.locator("[data-state]")).toHaveCount(8);
+  await expect(page.locator('[data-state="down"]').first()).toBeFocused();
 });
 
 test("how to play can be reopened during a game", async ({ page }) => {

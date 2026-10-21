@@ -12,6 +12,12 @@ import { lastLevel, pairsForLevel } from "../utils/pairsForLevel";
 
 export type CardState = "down" | "up" | "matched";
 
+/** Read out by the live region; `nonce` changes so a repeat is read again. */
+export type Announcement = { text: string; nonce: number };
+
+const MATCH = "It's a match!";
+const MISMATCH = "Not a match. They flip back.";
+
 export function useMemoryGame() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [level, setLevel] = useState(1);
@@ -21,6 +27,7 @@ export function useMemoryGame() {
   const [moves, setMoves] = useState(0);
   const [isBusy, setIsBusy] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const { schedule, clearAll } = useSafeTimeout();
 
   const settings = MEMORY_DIFFICULTY[difficulty ?? "easy"];
@@ -36,6 +43,7 @@ export function useMemoryGame() {
       setMoves(0);
       setGameWon(false);
       setIsBusy(false);
+      setAnnouncement(null);
     },
     [clearAll]
   );
@@ -55,6 +63,10 @@ export function useMemoryGame() {
     }, MEMORY_CONFIG.levelUpDelayMs);
   }, [matched, deck, difficulty, level, maxLevel, gameWon, schedule, dealBoard]);
 
+  const announce = useCallback((text: string) => {
+    setAnnouncement((prev) => ({ text, nonce: (prev?.nonce ?? 0) + 1 }));
+  }, []);
+
   const flipCard = useCallback(
     (idx: number) => {
       if (isBusy || flipped.includes(idx) || matched.includes(idx)) return;
@@ -69,19 +81,21 @@ export function useMemoryGame() {
       setMoves((m) => m + 1);
 
       if (deck[firstIdx].pairId === deck[idx].pairId) {
+        announce(MATCH);
         schedule(() => {
           setMatched((prev) => [...prev, firstIdx, idx]);
           setFlipped([]);
           setIsBusy(false);
         }, MEMORY_CONFIG.matchDelayMs);
       } else {
+        announce(MISMATCH);
         schedule(() => {
           setFlipped([]);
           setIsBusy(false);
         }, settings.mismatchDelayMs);
       }
     },
-    [isBusy, flipped, matched, deck, settings, schedule]
+    [isBusy, flipped, matched, deck, settings, schedule, announce]
   );
 
   const start = useCallback((chosen: Difficulty) => {
@@ -95,9 +109,10 @@ export function useMemoryGame() {
     setDeck([]);
   }, [clearAll]);
 
+  // Not during the level-up celebration: the next level is already on its way.
   const restartLevel = useCallback(() => {
-    if (difficulty) dealBoard(difficulty, level);
-  }, [dealBoard, difficulty, level]);
+    if (difficulty && !gameWon) dealBoard(difficulty, level);
+  }, [dealBoard, difficulty, level, gameWon]);
 
   const cardState = useCallback(
     (idx: number): CardState => {
@@ -116,6 +131,7 @@ export function useMemoryGame() {
     pairsFound: matched.length / 2,
     totalPairs: deck.length / 2,
     gameWon,
+    announcement,
     cardState,
     flipCard,
     start,

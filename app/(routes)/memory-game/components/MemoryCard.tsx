@@ -23,12 +23,17 @@ export default function MemoryCard({
 }: MemoryCardProps) {
   const reduceMotion = useReducedMotion();
   const isFaceUp = state !== "down";
+  const label = !isFaceUp
+    ? `Card ${position}, face down`
+    : state === "matched"
+      ? `${monster.name}, matched`
+      : monster.name;
 
   return (
     <motion.button
       type="button"
       data-state={state}
-      aria-label={isFaceUp ? monster.name : `Card ${position}, face down`}
+      aria-label={label}
       onClick={onFlip}
       className="relative aspect-square w-full max-w-[120px] sm:max-w-[140px] md:max-w-[160px] cursor-pointer rounded-2xl [transform-style:preserve-3d] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-4 focus-visible:ring-offset-paper"
       style={{ transformPerspective: 800 }}
