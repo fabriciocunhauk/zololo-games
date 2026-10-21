@@ -6,7 +6,9 @@ import {
   useReducedMotion,
   type TargetAndTransition,
 } from "framer-motion";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { classNames } from "@/app/utils/appearance";
+import { BUBBLE_POP_TEXT } from "../constants/text";
 import type { Bubble } from "../utils/createBubbles";
 import BubbleArt from "./BubbleArt";
 
@@ -50,6 +52,7 @@ export default function FloatingBubble({
   onPop,
 }: FloatingBubbleProps) {
   const reduceMotion = useReducedMotion();
+  const text = BUBBLE_POP_TEXT[useLocale()];
   // Fading or bursting after the round ended: never tappable again.
   const isLeaving = !useIsPresent();
   const isLocked = disabled || isLeaving;
@@ -58,7 +61,7 @@ export default function FloatingBubble({
     // aria-disabled, not disabled: the button keeps keyboard focus.
     <motion.button
       type="button"
-      aria-label={`Answer ${bubble.value}`}
+      aria-label={text.bubble(bubble.value)}
       aria-disabled={isLocked}
       onClick={() => {
         if (!isLocked) onPop(bubble);

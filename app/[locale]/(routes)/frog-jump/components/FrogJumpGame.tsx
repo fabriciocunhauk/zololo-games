@@ -7,7 +7,9 @@ import GameIntro from "@/app/components/GameIntro";
 import HowToPlay from "@/app/components/HowToPlay";
 import StarMeter from "@/app/components/StarMeter";
 import { useDifficulty } from "@/app/hooks/useDifficulty";
-import { FROG_JUMP_HOW_TO_PLAY } from "../constants/howToPlay";
+import { useLocale, useMessages } from "@/app/i18n/LocaleProvider";
+import { frogJumpHowToPlay } from "../constants/howToPlay";
+import { FROG_JUMP_TEXT } from "../constants/text";
 import { useFrogJumpGame } from "../hooks/useFrogJumpGame";
 import FrogPond from "./FrogPond";
 import NumberLine from "./NumberLine";
@@ -16,14 +18,17 @@ import ProblemDisplay from "./ProblemDisplay";
 export default function FrogJumpGame() {
   const game = useFrogJumpGame();
   const [difficulty, setDifficulty] = useDifficulty("frog-jump");
+  const locale = useLocale();
+  const title = useMessages().games["frog-jump"].name;
+  const text = FROG_JUMP_TEXT[locale];
 
   if (!game.difficulty || !game.problem) {
     return (
       <GameIntro
         hero={<FrogPond />}
-        title="Frog Jump"
-        blurb="Help the frog hop from pad to pad. Read the jump, work out where it lands, then tap the number!"
-        howToPlay={<HowToPlay {...FROG_JUMP_HOW_TO_PLAY} />}
+        title={title}
+        blurb={text.blurb}
+        howToPlay={<HowToPlay {...frogJumpHowToPlay(locale)} />}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
         onStart={() => game.start(difficulty)}
@@ -43,7 +48,7 @@ export default function FrogJumpGame() {
         }}
       >
         <GameHeader
-          title="Frog Jump"
+          title={title}
           difficulty={game.difficulty}
           onChangeDifficulty={game.quit}
           meter={
@@ -51,7 +56,7 @@ export default function FrogJumpGame() {
               level={game.level}
               stars={game.stars}
               total={game.roundsPerLevel}
-              caption={`jumps up to ${game.maxJump}`}
+              caption={text.caption(game.maxJump)}
             />
           }
         />

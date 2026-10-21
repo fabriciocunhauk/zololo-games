@@ -4,10 +4,12 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { playSound } from "@/app/utils/soundPlayer";
 import type { Bin } from "../constants/bins";
 import { SHAPE_CONFIG, SHAPE_DIFFICULTY } from "../constants/config";
 import type { Shape } from "../constants/shapes";
+import { SHAPE_TEXT } from "../constants/text";
 import { binFor } from "../utils/binFor";
 import { generateTray } from "../utils/generateShape";
 import { pickBins } from "../utils/pickBins";
@@ -37,6 +39,8 @@ export function useShapeSorterGame() {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const roundId = useRef(0);
   const { schedule, clearAll } = useSafeTimeout();
+  const locale = useLocale();
+  const text = SHAPE_TEXT[locale];
 
   const settings = SHAPE_DIFFICULTY[difficulty ?? "easy"];
   const progress = useLevelProgress({
@@ -88,13 +92,13 @@ export function useShapeSorterGame() {
       // A whole tray sorted earns the arpeggio; a new level the fanfare.
       playSound(next.levelUp ? "win" : "levelUp");
       setPhase("complete");
-      setFeedback({ tone: "success", text: roundCompleteText(next) });
+      setFeedback({ tone: "success", text: roundCompleteText(next, locale) });
       schedule(
         () => startRound(forDifficulty, next.level),
         SHAPE_CONFIG.roundCompleteMs
       );
     },
-    [progress, schedule, startRound]
+    [progress, locale, schedule, startRound]
   );
 
   const sort = useCallback(
@@ -106,7 +110,7 @@ export function useShapeSorterGame() {
 
       if (binFor(shape, settings.sortBy) !== binId) {
         playSound("wrong");
-        setFeedback({ tone: "error", text: "Not that one! Try another bin." });
+        setFeedback({ tone: "error", text: text.wrong });
         setShake((prev) => ({ binId, nonce: (prev?.nonce ?? 0) + 1 }));
         return;
       }
@@ -118,7 +122,10 @@ export function useShapeSorterGame() {
       }));
       setPhase("dropping");
       playSound("correct");
-      setFeedback({ tone: "success", text: `Yes! ${bin.praise}` });
+      setFeedback({
+        tone: "success",
+        text: text.right(text.binPraise(bin.name)),
+      });
 
       const isLast = index === round.tray.length - 1;
       schedule(() => {
@@ -130,7 +137,7 @@ export function useShapeSorterGame() {
         setPhase("sorting");
       }, SHAPE_CONFIG.dropMs);
     },
-    [round, difficulty, phase, index, settings, schedule, finishRound]
+    [round, difficulty, phase, index, settings, text, schedule, finishRound]
   );
 
   const sorted = Object.values(counts).reduce((sum, n) => sum + n, 0);

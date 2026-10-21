@@ -1,7 +1,9 @@
 "use client";
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef, type CSSProperties } from "react";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import type { NumberRange } from "../constants/config";
+import { FROG_JUMP_TEXT } from "../constants/text";
 import HoppingFrog from "./HoppingFrog";
 import LilyPad from "./LilyPad";
 
@@ -18,6 +20,7 @@ type NumberLineProps = {
  */
 export default function NumberLine({ line, start, landing }: NumberLineProps) {
   const reduceMotion = useReducedMotion();
+  const text = FROG_JUMP_TEXT[useLocale()];
   const pond = useRef<HTMLDivElement>(null);
   const hasScrolled = useRef(false);
   const frogAt = landing ?? start;
@@ -53,7 +56,7 @@ export default function NumberLine({ line, start, landing }: NumberLineProps) {
     <div
       ref={pond}
       role="region"
-      aria-label="Number line"
+      aria-label={text.numberLine}
       tabIndex={0}
       className="w-full overflow-x-auto overscroll-x-contain rounded-3xl border-[3px] border-ink bg-sky shadow-[0_6px_0_var(--color-ink)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-2"
     >

@@ -6,7 +6,9 @@ import HeaderButton from "@/app/components/HeaderButton";
 import HowToPlay from "@/app/components/HowToPlay";
 import Stat from "@/app/components/Stat";
 import { useDifficulty } from "@/app/hooks/useDifficulty";
-import { MEMORY_HOW_TO_PLAY } from "../constants/howToPlay";
+import { useLocale, useMessages } from "@/app/i18n/LocaleProvider";
+import { memoryHowToPlay } from "../constants/howToPlay";
+import { MEMORY_TEXT } from "../constants/text";
 import { useMemoryGame } from "../hooks/useMemoryGame";
 import MemoryBoard from "./MemoryBoard";
 import MonsterParade from "./MonsterParade";
@@ -14,14 +16,18 @@ import MonsterParade from "./MonsterParade";
 export default function MemoryGame() {
   const game = useMemoryGame();
   const [difficulty, setDifficulty] = useDifficulty("memory-game");
+  const locale = useLocale();
+  const messages = useMessages();
+  const title = messages.games["memory-game"].name;
+  const text = MEMORY_TEXT[locale];
 
   if (!game.difficulty) {
     return (
       <GameIntro
         hero={<MonsterParade />}
-        title="Memory Cards"
-        blurb="Meet the Zololo monsters! Every monster has a twin hiding under the cards. Can you find them all?"
-        howToPlay={<HowToPlay {...MEMORY_HOW_TO_PLAY} />}
+        title={title}
+        blurb={text.blurb}
+        howToPlay={<HowToPlay {...memoryHowToPlay(locale)} />}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
         onStart={() => game.start(difficulty)}
@@ -30,10 +36,10 @@ export default function MemoryGame() {
   }
 
   const nextStep = game.isLastLevel
-    ? "That was the last level! Here comes a fresh set of cards…"
-    : `Get ready for level ${game.level + 1}…`;
+    ? text.lastLevel
+    : text.nextLevel(game.level + 1);
   const live = game.gameWon
-    ? { text: `You found every pair! ${nextStep}`, key: "won" }
+    ? { text: `${text.won} ${nextStep}`, key: "won" }
     : game.announcement && {
         text: game.announcement.text,
         key: String(game.announcement.nonce),
@@ -46,32 +52,37 @@ export default function MemoryGame() {
         classes={{ container: "flex flex-col gap-8 px-4 sm:px-10" }}
       >
         <GameHeader
-          title="Memory Cards"
+          title={title}
           difficulty={game.difficulty}
           onChangeDifficulty={game.quit}
           stats={
             <>
-              <Stat label="Level" value={game.level} />
               <Stat
-                label="Pairs"
-                value={`${game.pairsFound}/${game.totalPairs}`}
+                label={messages.meter.level}
+                value={game.level}
+                testId="level"
               />
-              <Stat label="Moves" value={game.moves} />
+              <Stat
+                label={text.pairs}
+                value={`${game.pairsFound}/${game.totalPairs}`}
+                testId="pairs"
+              />
+              <Stat label={text.moves} value={game.moves} testId="moves" />
             </>
           }
           actions={
             // Hidden while celebrating: the next level is already on its way.
             !game.gameWon && (
               <HeaderButton onClick={game.restartLevel}>
-                Restart level
+                {text.restart}
               </HeaderButton>
             )
           }
-          howToPlay={<HowToPlay {...MEMORY_HOW_TO_PLAY} />}
+          howToPlay={<HowToPlay {...memoryHowToPlay(locale)} />}
         />
         {game.deck.length === 0 ? (
           <p className="py-10 text-center text-lg font-bold">
-            Shuffling the cards…
+            {text.shuffling}
           </p>
         ) : (
           <MemoryBoard

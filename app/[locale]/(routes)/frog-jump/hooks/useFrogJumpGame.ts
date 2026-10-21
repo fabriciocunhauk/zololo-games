@@ -4,9 +4,11 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { playSound } from "@/app/utils/soundPlayer";
 import { resultSound } from "@/app/utils/sounds";
 import { FROG_JUMP_CONFIG, FROG_JUMP_DIFFICULTY } from "../constants/config";
+import { FROG_JUMP_TEXT } from "../constants/text";
 import {
   generateJumpProblem,
   type JumpProblem,
@@ -18,6 +20,7 @@ export function useFrogJumpGame() {
   const [selected, setSelected] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const { schedule, clearAll } = useSafeTimeout();
+  const text = FROG_JUMP_TEXT[useLocale()];
 
   const settings = FROG_JUMP_DIFFICULTY[difficulty ?? "easy"];
   const progress = useLevelProgress({
@@ -61,12 +64,10 @@ export function useFrogJumpGame() {
       if (choice === problem.answer) {
         const next = progress.recordCorrect();
         playSound(resultSound(next));
-        const text = next.levelUp
-          ? `🎉 Excellent! Level up! Now jumps go up to ${settings.levels[next.level].max}.`
-          : next.stars === 0
-            ? "🎉 Excellent! Another row of stars!"
-            : "🎉 Excellent!";
-        setFeedback({ tone: "success", text });
+        setFeedback({
+          tone: "success",
+          text: text.right(next, settings.levels[next.level].max),
+        });
         schedule(
           () => startRound(difficulty, next.level, problem),
           FROG_JUMP_CONFIG.nextRoundDelayMs,
@@ -76,18 +77,13 @@ export function useFrogJumpGame() {
 
       // Wrong: the frog still hops, to the right pad, and we say where.
       playSound("wrong");
-      const { start: from, operation, jump, answer: landing } = problem;
-      const sign = operation === "+" ? "+" : "−";
-      setFeedback({
-        tone: "error",
-        text: `Not quite! ${from} ${sign} ${jump} = ${landing}, so the frog lands on ${landing}.`,
-      });
+      setFeedback({ tone: "error", text: text.wrong(problem) });
       schedule(
         () => startRound(difficulty, progress.level, problem),
         FROG_JUMP_CONFIG.wrongHoldMs,
       );
     },
-    [problem, difficulty, selected, progress, settings, schedule, startRound],
+    [problem, difficulty, selected, progress, settings, text, schedule, startRound],
   );
 
   return {

@@ -4,6 +4,9 @@ export type LevelProgress = {
   stars: number;
 };
 
+/** Progress after a right answer, as returned by `advanceLevel`. */
+export type LevelStep = LevelProgress & { levelUp: boolean };
+
 export type LevelRules = {
   levelCount: number;
   roundsPerLevel: number;
@@ -16,7 +19,7 @@ export type LevelRules = {
 export function advanceLevel(
   { level, stars }: LevelProgress,
   { levelCount, roundsPerLevel }: LevelRules
-): LevelProgress & { levelUp: boolean } {
+): LevelStep {
   const earned = stars + 1;
   if (earned < roundsPerLevel) return { level, stars: earned, levelUp: false };
   const levelUp = level < levelCount - 1;

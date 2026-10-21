@@ -1,9 +1,11 @@
 "use client";
 import { motion } from "framer-motion";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import type { Shape, ShapeSize } from "../constants/shapes";
 import { describeShape } from "../utils/describeShape";
 import { binFor } from "../utils/binFor";
 import type { SortBy } from "../constants/config";
+import { SHAPE_TEXT } from "../constants/text";
 import ShapeArt from "./ShapeArt";
 
 type ShapeTrayProps = {
@@ -28,6 +30,10 @@ export default function ShapeTray({
   sortBy,
   isComplete,
 }: ShapeTrayProps) {
+  const locale = useLocale();
+  const text = SHAPE_TEXT[locale];
+  const description = shape ? describeShape(shape, locale) : "";
+
   return (
     <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border-[3px] border-ink bg-sky/30 shadow-[0_8px_0_var(--color-ink)]">
       <div className="flex h-48 items-end justify-center pb-3 sm:h-56">
@@ -36,7 +42,7 @@ export default function ShapeTray({
             key={shapeKey}
             layoutId={shapeKey}
             role="img"
-            aria-label={describeShape(shape)}
+            aria-label={description}
             data-testid="shape"
             data-belongs={binFor(shape, sortBy) ?? undefined}
             initial={{ x: -220, opacity: 0 }}
@@ -53,7 +59,7 @@ export default function ShapeTray({
         )}
         {/* Announces each new shape; the feedback keeps the only role="status". */}
         <p aria-live="polite" className="sr-only">
-          {shape ? `Here comes ${describeShape(shape)}.` : ""}
+          {shape ? text.hereComes(description) : ""}
         </p>
         {isComplete && (
           <motion.div
@@ -68,7 +74,9 @@ export default function ShapeTray({
             >
               ★
             </span>
-            <p className="font-display text-3xl sm:text-4xl">Round complete!</p>
+            <p className="font-display text-3xl sm:text-4xl">
+              {text.roundBanner}
+            </p>
           </motion.div>
         )}
       </div>

@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { DIFFICULTIES } from "@/app/constants/difficulty";
 import { GAMES } from "@/app/constants/games";
+import { localeHref, type Locale } from "@/app/i18n/locales";
+import { MESSAGES } from "@/app/i18n/messages";
 import lockup from "@/public/images/brand/zololo-games-lockup.png";
 import Container from "./Container";
 import MonsterArt from "./monsters/MonsterArt";
@@ -13,7 +15,9 @@ const PEEKERS = [MONSTERS[0], MONSTERS[4], MONSTERS[9], MONSTERS[14]];
 const linkClasses =
   "rounded-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink";
 
-export default function Footer() {
+export default function Footer({ locale }: { locale: Locale }) {
+  const text = MESSAGES[locale];
+
   return (
     <footer className="relative mt-auto border-t-[3px] border-ink bg-pink-primary">
       <div
@@ -37,33 +41,36 @@ export default function Footer() {
         }}
       >
         <section className="flex flex-col items-start gap-3">
-          <Link href="/" aria-label="Zololo Games home" className={linkClasses}>
+          <Link
+            href={localeHref(locale, "/")}
+            aria-label={text.nav.homeAria}
+            className={linkClasses}
+          >
             <Image src={lockup} alt="" className="h-20 w-auto" />
           </Link>
           <p className="max-w-xs font-bold">
-            Little games for curious minds. Free to play, nothing to sign up
-            for.
+            {text.footer.tagline}
           </p>
         </section>
 
         <nav aria-labelledby="footer-games">
           <h2 id="footer-games" className="font-display text-xl">
-            Games
+            {text.footer.games}
           </h2>
           <ul className="mt-3 grid grid-cols-1 gap-x-4 gap-y-1 min-[420px]:grid-cols-2">
-            {GAMES.map(({ name, href, skill, Art }) => (
+            {GAMES.map(({ slug, href, Art }) => (
               <li key={href}>
                 <Link
-                  href={href}
+                  href={localeHref(locale, href)}
                   className={`${linkClasses} group flex min-h-11 items-center gap-3 py-1`}
                 >
                   <Art className="h-9 w-auto shrink-0 motion-safe:transition-transform motion-safe:group-hover:-rotate-6" />
                   <span className="flex flex-col leading-tight">
                     <span className="font-bold group-hover:underline group-hover:decoration-2 group-hover:underline-offset-2">
-                      {name}
+                      {text.games[slug].name}
                     </span>
                     <span className="text-xs font-bold uppercase tracking-[0.1em] text-ink/70">
-                      {skill}
+                      {text.games[slug].skill}
                     </span>
                   </span>
                 </Link>
@@ -74,11 +81,10 @@ export default function Footer() {
 
         <section aria-labelledby="footer-grown-ups">
           <h2 id="footer-grown-ups" className="font-display text-xl">
-            For grown-ups
+            {text.footer.grownUps}
           </h2>
           <p className="mt-3">
-            Every game has three levels. Pick the one that fits, then play
-            along and talk about what you see.
+            {text.footer.grownUpsText}
           </p>
           <ul className="mt-4 flex flex-wrap gap-2">
             {DIFFICULTIES.map((option) => (
@@ -87,7 +93,8 @@ export default function Footer() {
                 style={{ background: option.tile }}
                 className="rounded-full border-[3px] border-ink px-3 py-0.5 text-sm font-bold"
               >
-                {option.label} · {option.ages}
+                {text.difficulty[option.id].label} ·{" "}
+                {text.difficulty[option.id].ages}
               </li>
             ))}
           </ul>
@@ -102,12 +109,14 @@ export default function Footer() {
               "flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm font-bold sm:px-10",
           }}
         >
-          <p>&copy; {new Date().getFullYear()} Zololo Games</p>
+          <p>
+            &copy; {new Date().getFullYear()} {text.site.name}
+          </p>
           <a
             href="#"
             className="flex min-h-11 items-center rounded-lg px-2 underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-paper"
           >
-            Back to top ↑
+            {text.footer.backToTop}
           </a>
         </Container>
       </div>

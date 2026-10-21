@@ -26,9 +26,13 @@ export type SpellRound = {
 export type LetterRound = ChooseRound | SpellRound;
 
 /** Random letters that are not in `avoid` and don't sound like anything in it. */
-function pickDistractors(avoid: ReadonlyArray<string>, count: number) {
+function pickDistractors(
+  alphabet: ReadonlyArray<string>,
+  avoid: ReadonlyArray<string>,
+  count: number
+) {
   const blocked = new Set(avoid.flatMap(soundAlikes));
-  return shuffle(ALPHABET.filter((l) => !blocked.has(l))).slice(0, count);
+  return shuffle(alphabet.filter((l) => !blocked.has(l))).slice(0, count);
 }
 
 /** First letters of the picture's other names, so a fair guess is never marked wrong. */
@@ -45,6 +49,7 @@ function pickWord(words: ReadonlyArray<PictureWord>, previous?: string) {
 
 function chooseRound(
   words: ReadonlyArray<PictureWord>,
+  alphabet: ReadonlyArray<string>,
   settings: ChooseSettings,
   previous?: string
 ): ChooseRound {
@@ -53,6 +58,7 @@ function chooseRound(
   const options = shuffle([
     letter,
     ...pickDistractors(
+      alphabet,
       [letter, ...otherNameLetters(word)],
       settings.optionCount - 1
     ),
@@ -67,31 +73,37 @@ function chooseRound(
 
 function spellRound(
   words: ReadonlyArray<PictureWord>,
+  alphabet: ReadonlyArray<string>,
   settings: SpellSettings,
   previous?: string
 ): SpellRound {
   const word = pickWord(
-    words.filter((w) => w.cvc),
+    words.filter((w) => w.spellable),
     previous
   );
   const letters = word.word.split("");
   const bank = shuffle([
     ...letters,
     ...pickDistractors(
+      alphabet,
       [...letters, ...otherNameLetters(word)],
-      settings.distractorCount
+      Math.max(0, settings.bankSize - letters.length)
     ),
   ]);
   return { kind: "spell", word, bank };
 }
 
-/** One picture word per round, never the same word twice in a row. */
+/**
+ * One picture word per round, never the same word twice in a row.
+ * Distractors come from `alphabet`, the letters of the words' language.
+ */
 export function generateLetterRound(
   words: ReadonlyArray<PictureWord>,
   settings: LetterSettings,
-  previous?: string
+  previous?: string,
+  alphabet: ReadonlyArray<string> = ALPHABET.en
 ): LetterRound {
   return settings.mode === "spell"
-    ? spellRound(words, settings, previous)
-    : chooseRound(words, settings, previous);
+    ? spellRound(words, alphabet, settings, previous)
+    : chooseRound(words, alphabet, settings, previous);
 }

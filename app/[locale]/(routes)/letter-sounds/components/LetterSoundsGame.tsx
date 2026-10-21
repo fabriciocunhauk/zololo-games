@@ -7,27 +7,30 @@ import GameIntro from "@/app/components/GameIntro";
 import HowToPlay from "@/app/components/HowToPlay";
 import StarMeter from "@/app/components/StarMeter";
 import { useDifficulty } from "@/app/hooks/useDifficulty";
+import { useLocale, useMessages } from "@/app/i18n/LocaleProvider";
 import { classNames } from "@/app/utils/appearance";
 import { LETTER_DIFFICULTY } from "../constants/config";
-import { LETTER_HOW_TO_PLAY } from "../constants/howToPlay";
+import { letterSoundsHowToPlay } from "../constants/howToPlay";
+import { LETTER_TEXT } from "../constants/text";
 import { useLetterSoundsGame } from "../hooks/useLetterSoundsGame";
 import LetterBlocksHero from "./LetterBlocksHero";
 import PictureCard from "./PictureCard";
 import SpellingBoard from "./SpellingBoard";
 
-const TITLE = "Letter Sounds";
-
 export default function LetterSoundsGame() {
   const game = useLetterSoundsGame();
   const [difficulty, setDifficulty] = useDifficulty("letter-sounds");
+  const locale = useLocale();
+  const title = useMessages().games["letter-sounds"].name;
+  const text = LETTER_TEXT[locale];
 
   if (!game.difficulty || !game.round) {
     return (
       <GameIntro
         hero={<LetterBlocksHero />}
-        title={TITLE}
-        blurb="Apple, ball, cat… Look at the picture, say its name and find the letter it starts with!"
-        howToPlay={<HowToPlay {...LETTER_HOW_TO_PLAY} />}
+        title={title}
+        blurb={text.blurb}
+        howToPlay={<HowToPlay {...letterSoundsHowToPlay(locale)} />}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
         onStart={() => game.start(difficulty)}
@@ -48,7 +51,7 @@ export default function LetterSoundsGame() {
         }}
       >
         <GameHeader
-          title={TITLE}
+          title={title}
           difficulty={game.difficulty}
           onChangeDifficulty={game.quit}
           meter={
@@ -56,7 +59,7 @@ export default function LetterSoundsGame() {
               level={game.level}
               stars={game.stars}
               total={game.roundsPerLevel}
-              caption={settings.caption}
+              caption={text.caption[game.difficulty]}
             />
           }
         />
@@ -64,7 +67,7 @@ export default function LetterSoundsGame() {
           data-testid="question"
           className="text-center font-display text-2xl sm:text-4xl"
         >
-          {isChoose ? "Which letter does it start with?" : "Spell the word"}
+          {isChoose ? text.question.choose : text.question.spell}
         </h2>
         <PictureCard
           word={round.word}

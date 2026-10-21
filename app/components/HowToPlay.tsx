@@ -1,7 +1,28 @@
+"use client";
 import type { ReactNode } from "react";
+import { useMessages } from "@/app/i18n/LocaleProvider";
 import { classNames } from "@/app/utils/appearance";
 
 export type HowToPlayStep = { text: string; picture: ReactNode };
+
+/**
+ * Pairs each translated step with its picture, in order. The counts must
+ * match, or a picture would land on the wrong step.
+ */
+export function withPictures(
+  { steps, tip }: { steps: ReadonlyArray<string>; tip: string },
+  pictures: ReadonlyArray<ReactNode>
+) {
+  if (steps.length !== pictures.length) {
+    throw new Error(
+      `How to play has ${steps.length} steps but ${pictures.length} pictures.`
+    );
+  }
+  return {
+    steps: steps.map((text, idx) => ({ text, picture: pictures[idx] })),
+    tip,
+  };
+}
 
 type HowToPlayProps = {
   steps: ReadonlyArray<HowToPlayStep>;
@@ -11,6 +32,8 @@ type HowToPlayProps = {
 
 /** Numbered, illustrated steps. The numbers are real: steps happen in order. */
 export default function HowToPlay({ steps, tip, className }: HowToPlayProps) {
+  const text = useMessages().howToPlay;
+
   return (
     <section
       aria-labelledby="how-to-play"
@@ -20,7 +43,7 @@ export default function HowToPlay({ steps, tip, className }: HowToPlayProps) {
       )}
     >
       <h2 id="how-to-play" className="font-display text-2xl sm:text-3xl">
-        How to play
+        {text.heading}
       </h2>
       <ol className="mt-6 grid gap-6 sm:grid-cols-3">
         {steps.map(({ text, picture }, idx) => (
@@ -42,7 +65,7 @@ export default function HowToPlay({ steps, tip, className }: HowToPlayProps) {
       </ol>
       {tip && (
         <p className="mt-6 rounded-2xl bg-sun/40 px-4 py-3 text-sm sm:text-base">
-          <strong>Tip:</strong> {tip}
+          <strong>{text.tip}</strong> {tip}
         </p>
       )}
     </section>

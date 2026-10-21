@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
 import type { NavItem } from "@/app/constants/navItems";
+import { useMessages } from "@/app/i18n/LocaleProvider";
 import NavLink from "./NavLink";
 
 const iconButtonClasses =
@@ -13,6 +14,7 @@ export default function MobileMenu({
 }: {
   items: ReadonlyArray<NavItem>;
 }) {
+  const { nav } = useMessages();
   const [isOpen, setIsOpen] = useState(false);
   const openButton = useRef<HTMLButtonElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -40,7 +42,7 @@ export default function MobileMenu({
       <button
         ref={openButton}
         type="button"
-        aria-label="Open menu"
+        aria-label={nav.openMenu}
         aria-expanded={isOpen}
         aria-controls="mobile-menu"
         onClick={() => setIsOpen(true)}
@@ -54,13 +56,13 @@ export default function MobileMenu({
           id="mobile-menu"
           role="dialog"
           aria-modal="true"
-          aria-label="Menu"
+          aria-label={nav.menu}
           className="fixed inset-0 z-30 flex flex-col overflow-y-auto bg-paper px-4 py-3"
         >
           <button
             ref={closeButton}
             type="button"
-            aria-label="Close menu"
+            aria-label={nav.closeMenu}
             onClick={close}
             className={`${iconButtonClasses} self-end`}
           >

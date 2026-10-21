@@ -149,7 +149,7 @@ describe("generatePattern", () => {
       for (let i = 0; i < RUNS; i++) {
         const pool =
           faces === "colours"
-            ? colourVariants(MONSTERS[i % MONSTERS.length])
+            ? colourVariants(MONSTERS[i % MONSTERS.length], "en")
             : MONSTERS;
         const round = generatePattern(settings, pool, monsterResemblance);
         expectFairRound(round, settings);
@@ -216,7 +216,7 @@ describe("generatePattern", () => {
 describe("monster faces", () => {
   it("makes one uniquely named variant per colour that differs only by colour", () => {
     const [base] = MONSTERS;
-    const variants = colourVariants(base);
+    const variants = colourVariants(base, "en");
     expect(new Set(variants.map((v) => v.color)).size).toBe(variants.length);
     expect(new Set(variants.map((v) => v.name)).size).toBe(variants.length);
     for (const { name, color, ...looks } of variants) {

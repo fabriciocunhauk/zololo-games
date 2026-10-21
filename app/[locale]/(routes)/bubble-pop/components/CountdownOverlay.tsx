@@ -1,6 +1,8 @@
 "use client";
 import type { CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useLocale } from "@/app/i18n/LocaleProvider";
+import { BUBBLE_POP_TEXT } from "../constants/text";
 
 const TILES = [
   "var(--color-sun)",
@@ -24,7 +26,8 @@ export default function CountdownOverlay({
   countdown: number | null;
 }) {
   const reduceMotion = useReducedMotion();
-  const label = countdown === null ? "" : countdown > 0 ? countdown : "GO!";
+  const { go } = BUBBLE_POP_TEXT[useLocale()];
+  const label = countdown === null ? "" : countdown > 0 ? countdown : go;
 
   return (
     <>

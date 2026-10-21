@@ -1,5 +1,7 @@
+"use client";
 import type { CSSProperties, ReactNode } from "react";
 import { difficultyOption, type Difficulty } from "@/app/constants/difficulty";
+import { useMessages } from "@/app/i18n/LocaleProvider";
 import HeaderButton from "./HeaderButton";
 import ScrollToTop from "./ScrollToTop";
 import SoundToggle from "./SoundToggle";
@@ -29,7 +31,9 @@ export default function GameHeader({
   actions,
   howToPlay,
 }: GameHeaderProps) {
+  const text = useMessages();
   const option = difficultyOption(difficulty);
+  const { label, ages } = text.difficulty[difficulty];
   const chipStyle: CSSProperties = { background: option.tile };
 
   return (
@@ -43,7 +47,7 @@ export default function GameHeader({
             style={chipStyle}
             className="rounded-full border-[3px] border-ink px-2.5 py-0.5 text-xs font-bold sm:px-3 sm:text-sm"
           >
-            {option.label} · {option.ages}
+            {label} · {ages}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -52,7 +56,7 @@ export default function GameHeader({
           {actions}
           <SoundToggle />
           <HeaderButton tone="bg-white" onClick={onChangeDifficulty}>
-            Change difficulty
+            {text.header.changeDifficulty}
           </HeaderButton>
         </div>
       </div>
@@ -60,8 +64,12 @@ export default function GameHeader({
       {howToPlay && (
         <details className="group">
           <summary className="w-fit cursor-pointer rounded-lg font-bold underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink">
-            <span className="group-open:hidden">Show how to play</span>
-            <span className="hidden group-open:inline">Hide how to play</span>
+            <span className="group-open:hidden">
+              {text.header.showHowToPlay}
+            </span>
+            <span className="hidden group-open:inline">
+              {text.header.hideHowToPlay}
+            </span>
           </summary>
           <div className="mt-4">{howToPlay}</div>
         </details>

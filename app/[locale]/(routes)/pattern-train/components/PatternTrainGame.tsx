@@ -11,12 +11,13 @@ import type { Monster } from "@/app/components/monsters/monsters";
 import MonsterArt from "@/app/components/monsters/MonsterArt";
 import StarMeter from "@/app/components/StarMeter";
 import { useDifficulty } from "@/app/hooks/useDifficulty";
-import { PATTERN_HOW_TO_PLAY } from "../constants/howToPlay";
+import { useLocale, useMessages } from "@/app/i18n/LocaleProvider";
+import { patternTrainHowToPlay } from "../constants/howToPlay";
+import { PATTERN_TEXT } from "../constants/text";
 import { usePatternTrainGame } from "../hooks/usePatternTrainGame";
 import TrainStation from "./Train";
 import TrainHero from "./TrainHero";
 
-const TITLE = "Pattern Train";
 const monsterName = (monster: Monster) => monster.name;
 const renderMonster = (monster: Monster) => (
   <MonsterArt monster={monster} className="h-14 w-14 sm:h-20 sm:w-20" />
@@ -26,6 +27,10 @@ export default function PatternTrainGame() {
   const game = usePatternTrainGame();
   const [difficulty, setDifficulty] = useDifficulty("pattern-train");
   const reduceMotion = useReducedMotion();
+  const locale = useLocale();
+  const title = useMessages().games["pattern-train"].name;
+  const text = PATTERN_TEXT[locale];
+  const howToPlay = <HowToPlay {...patternTrainHowToPlay(locale)} />;
   /** The last train to pull in. Until the current one has, the options wait. */
   const [arrivedTrain, setArrivedTrain] = useState(0);
 
@@ -33,9 +38,9 @@ export default function PatternTrainGame() {
     return (
       <GameIntro
         hero={<TrainHero />}
-        title={TITLE}
-        blurb="All aboard! The monsters ride the train in a pattern. Spot who's missing and help the train chuff along."
-        howToPlay={<HowToPlay {...PATTERN_HOW_TO_PLAY} />}
+        title={title}
+        blurb={text.blurb}
+        howToPlay={howToPlay}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
         onStart={() => game.start(difficulty)}
@@ -55,7 +60,7 @@ export default function PatternTrainGame() {
         }}
       >
         <GameHeader
-          title={TITLE}
+          title={title}
           difficulty={game.difficulty}
           onChangeDifficulty={game.quit}
           meter={
@@ -63,10 +68,10 @@ export default function PatternTrainGame() {
               level={game.level}
               stars={game.stars}
               total={game.roundsPerLevel}
-              caption={`${game.carriageCount} carriages`}
+              caption={text.caption(game.carriageCount)}
             />
           }
-          howToPlay={<HowToPlay {...PATTERN_HOW_TO_PLAY} />}
+          howToPlay={howToPlay}
         />
         <TrainStation
           trainId={game.trainId}
@@ -76,17 +81,18 @@ export default function PatternTrainGame() {
           onArrive={setArrivedTrain}
         />
         <p className="text-center font-display text-2xl sm:text-3xl">
-          Who rides in the{" "}
+          {text.question.before}{" "}
           <span
             aria-hidden
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border-[3px] border-dashed border-ink bg-white align-middle"
           >
             ?
           </span>
-          <span className="sr-only">empty</span> carriage?
+          <span className="sr-only">{text.question.hidden}</span>{" "}
+          {text.question.after}
         </p>
         <AnswerOptions
-          label="Who rides in the empty carriage?"
+          label={text.optionsLabel}
           options={game.options}
           onSelect={game.answer}
           disabled={game.solved || boarding}

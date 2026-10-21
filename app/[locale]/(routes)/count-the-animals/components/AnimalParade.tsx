@@ -5,9 +5,9 @@ import { ANIMALS } from "../constants/animals";
 export default function AnimalParade() {
   return (
     <div aria-hidden className="flex justify-center gap-1.5 sm:gap-3">
-      {ANIMALS.map(({ name, kind }, idx) => (
+      {ANIMALS.map(({ kind }, idx) => (
         <AnimalArt
-          key={name}
+          key={kind}
           kind={kind}
           className="w-9 sm:w-14 h-auto motion-safe:animate-bounce"
           style={{

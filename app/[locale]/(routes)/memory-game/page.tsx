@@ -1,10 +1,7 @@
-import type { Metadata } from "next";
+import { gameMetadata } from "@/app/i18n/pageMetadata";
 import MemoryGame from "./components/MemoryGame";
 
-export const metadata: Metadata = {
-  title: "Memory Cards",
-  description: "Flip the cards and find the matching pairs.",
-};
+export const generateMetadata = gameMetadata("memory-game");
 
 export default function MemoryGamePage() {
   return <MemoryGame />;

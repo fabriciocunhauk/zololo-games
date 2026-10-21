@@ -8,25 +8,28 @@ import HowToPlay from "@/app/components/HowToPlay";
 import StarMeter from "@/app/components/StarMeter";
 import Stat from "@/app/components/Stat";
 import { useDifficulty } from "@/app/hooks/useDifficulty";
-import { SHAPE_HOW_TO_PLAY } from "../constants/howToPlay";
+import { useLocale, useMessages } from "@/app/i18n/LocaleProvider";
+import { shapeSorterHowToPlay } from "../constants/howToPlay";
+import { SHAPE_TEXT } from "../constants/text";
 import { useShapeSorterGame } from "../hooks/useShapeSorterGame";
 import ShapeParade from "./ShapeParade";
 import ShapeTray from "./ShapeTray";
 import SortingBins from "./SortingBins";
 
-const TITLE = "Shape Sorter";
-
 export default function ShapeSorterGame() {
   const game = useShapeSorterGame();
   const [difficulty, setDifficulty] = useDifficulty("shape-sorter");
+  const locale = useLocale();
+  const title = useMessages().games["shape-sorter"].name;
+  const text = SHAPE_TEXT[locale];
 
   if (!game.difficulty || !game.round) {
     return (
       <GameIntro
         hero={<ShapeParade />}
-        title={TITLE}
-        blurb="Shapes are rolling along the conveyor belt! Tap the right bin to sort each one by colour, by shape or by how many sides it has."
-        howToPlay={<HowToPlay {...SHAPE_HOW_TO_PLAY} />}
+        title={title}
+        blurb={text.blurb}
+        howToPlay={<HowToPlay {...shapeSorterHowToPlay(locale)} />}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
         onStart={() => game.start(difficulty)}
@@ -45,7 +48,7 @@ export default function ShapeSorterGame() {
         }}
       >
         <GameHeader
-          title={TITLE}
+          title={title}
           difficulty={game.difficulty}
           onChangeDifficulty={game.quit}
           meter={
@@ -53,12 +56,12 @@ export default function ShapeSorterGame() {
               level={game.level}
               stars={game.stars}
               total={game.roundsPerLevel}
-              caption={settings.caption}
+              caption={text.caption[settings.sortBy]}
             />
           }
           stats={
             <Stat
-              label="Sorted"
+              label={text.sorted}
               value={`${game.sorted}/${game.total}`}
               testId="sorted"
             />
@@ -68,7 +71,7 @@ export default function ShapeSorterGame() {
           data-testid="question"
           className="text-center font-display text-2xl sm:text-4xl"
         >
-          {settings.question}
+          {text.question[settings.sortBy]}
         </h2>
         {/* Reduced motion: shapes appear and land without flying. */}
         <MotionConfig reducedMotion="user">

@@ -9,15 +9,13 @@ export type ChooseSettings = {
   /** Show the word with its first letter blanked ("_pple"), or the picture only. */
   showWord: boolean;
   optionCount: number;
-  /** Shown beside the level in the star meter. */
-  caption: string;
 };
 
-/** Spell a CVC word from a bank of its letters plus distractors. */
+/** Spell a short word from a bank of its letters plus distractors. */
 export type SpellSettings = {
   mode: "spell";
-  distractorCount: number;
-  caption: string;
+  /** Tiles in the bank: the word's letters, topped up with distractors. */
+  bankSize: number;
 };
 
 export type LetterSettings = ChooseSettings | SpellSettings;
@@ -29,19 +27,16 @@ export const LETTER_DIFFICULTY: Readonly<Record<Difficulty, LetterSettings>> =
       letterCase: "upper",
       showWord: true,
       optionCount: 3,
-      caption: "first letter",
     },
     medium: {
       mode: "choose",
       letterCase: "lower",
       showWord: false,
       optionCount: 4,
-      caption: "name & pick",
     },
     hard: {
       mode: "spell",
-      distractorCount: 3,
-      caption: "spell it",
+      bankSize: 6,
     },
   });
 

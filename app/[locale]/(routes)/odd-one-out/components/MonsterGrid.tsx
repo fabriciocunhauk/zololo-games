@@ -4,7 +4,9 @@ import { useRef, type CSSProperties } from "react";
 import type { Monster } from "@/app/components/monsters/monsters";
 import MonsterArt from "@/app/components/monsters/MonsterArt";
 import { useFocusRescue } from "@/app/hooks/useFocusRescue";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { classNames } from "@/app/utils/appearance";
+import { ODD_TEXT } from "../constants/text";
 import type { RoundOutcome } from "../hooks/useOddOneOutGame";
 import { monsterLook } from "../utils/makeOddOneOut";
 
@@ -57,6 +59,7 @@ export default function MonsterGrid({
   onTap,
 }: MonsterGridProps) {
   const reduceMotion = useReducedMotion();
+  const text = ODD_TEXT[useLocale()];
   // Outlives each round's grid, so focus moves to the new tiles.
   const area = useRef<HTMLDivElement>(null);
   useFocusRescue(area);
@@ -78,7 +81,7 @@ export default function MonsterGrid({
       <div
         key={roundId}
         role="group"
-        aria-label="Monsters"
+        aria-label={text.grid}
         style={gridStyle}
         className={classNames("grid w-full gap-3 sm:gap-4", width)}
       >
@@ -105,7 +108,7 @@ export default function MonsterGrid({
                 type="button"
                 data-testid="monster-tile"
                 data-look={monsterLook(monster)}
-                aria-label={`Monster ${idx + 1}`}
+                aria-label={text.tile(idx + 1)}
                 aria-disabled={isLocked}
                 onClick={() => {
                   if (!isLocked) onTap(idx);

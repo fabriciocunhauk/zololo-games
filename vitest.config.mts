@@ -10,7 +10,7 @@ export default defineConfig({
     include: ["app/**/*.test.ts"],
     coverage: {
       provider: "v8",
-      include: ["app/utils/**/*.ts", "app/(routes)/*/utils/**/*.ts"],
+      include: ["app/utils/**/*.ts", "app/[[]locale]/(routes)/*/utils/**/*.ts"],
       exclude: ["**/*.test.ts"],
     },
   },

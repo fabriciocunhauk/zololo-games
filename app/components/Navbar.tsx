@@ -1,19 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
-import { NAV_ITEMS } from "@/app/constants/navItems";
+import { navItems } from "@/app/constants/navItems";
+import { localeHref, type Locale } from "@/app/i18n/locales";
+import { MESSAGES } from "@/app/i18n/messages";
+import LanguageSwitcher from "./LanguageSwitcher";
 import MobileMenu from "./MobileMenu";
 import NavLink from "./NavLink";
 import lockup from "@/public/images/brand/zololo-games-lockup.png";
 
-export default function Navbar() {
+export default function Navbar({ locale }: { locale: Locale }) {
+  const { nav } = MESSAGES[locale];
+  const items = navItems(locale);
+
   return (
     <nav
-      aria-label="Main"
+      aria-label={nav.label}
       className="fixed inset-x-0 top-0 z-20 flex items-center justify-between gap-6 border-b-[3px] border-ink bg-pink-primary px-4 py-3"
     >
       <Link
-        href="/"
-        aria-label="Zololo Games home"
+        href={localeHref(locale, "/")}
+        aria-label={nav.homeAria}
         className="rounded py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink"
       >
         <Image
@@ -25,14 +31,17 @@ export default function Navbar() {
       </Link>
 
       <ul className="hidden 2xl:flex items-center gap-6 whitespace-nowrap">
-        {NAV_ITEMS.map(({ label, href }) => (
+        {items.map(({ label, href }) => (
           <li key={href}>
             <NavLink href={href}>{label}</NavLink>
           </li>
         ))}
       </ul>
 
-      <MobileMenu items={NAV_ITEMS} />
+      <div className="flex items-center gap-3">
+        <LanguageSwitcher />
+        <MobileMenu items={items} />
+      </div>
     </nav>
   );
 }

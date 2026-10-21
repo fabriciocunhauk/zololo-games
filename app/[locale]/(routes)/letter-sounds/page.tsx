@@ -1,11 +1,7 @@
-import type { Metadata } from "next";
+import { gameMetadata } from "@/app/i18n/pageMetadata";
 import LetterSoundsGame from "./components/LetterSoundsGame";
 
-export const metadata: Metadata = {
-  title: "Letter Sounds",
-  description:
-    "Look at the picture, hear the word and pick the letter it starts with. On Hard, spell three-letter words.",
-};
+export const generateMetadata = gameMetadata("letter-sounds");
 
 export default function LetterSoundsPage() {
   return <LetterSoundsGame />;

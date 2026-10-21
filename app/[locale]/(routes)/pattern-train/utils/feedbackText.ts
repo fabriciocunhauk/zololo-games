@@ -1,18 +1,24 @@
 import type { Monster } from "@/app/components/monsters/monsters";
+import type { Locale } from "@/app/i18n/locales";
 import type { PatternSettings } from "../constants/config";
+import { PATTERN_TEXT } from "../constants/text";
 import { colourName } from "./monsterFaces";
 
 /** Praise for the right monster, with news of a level up or a fresh star row. */
-export function rightText({
-  levelUp,
-  stars,
-}: {
-  levelUp: boolean;
-  stars: number;
-}): string {
-  if (levelUp) return "🎉 Choo choo! That's right! Level up: longer trains!";
-  if (stars === 0) return "🎉 Choo choo! That's right! Another row of stars!";
-  return "🎉 Choo choo! That's right!";
+export function rightText(
+  {
+    levelUp,
+    stars,
+  }: {
+    levelUp: boolean;
+    stars: number;
+  },
+  locale: Locale
+): string {
+  const { right } = PATTERN_TEXT[locale];
+  if (levelUp) return right.base + right.levelUp;
+  if (stars === 0) return right.base + right.fullRow;
+  return right.base;
 }
 
 /**
@@ -21,11 +27,13 @@ export function rightText({
  */
 export function revealText(
   answer: Monster,
-  faces: PatternSettings["faces"]
+  faces: PatternSettings["faces"],
+  locale: Locale
 ): string {
+  const text = PATTERN_TEXT[locale];
   const who =
     faces === "colours"
-      ? `It was the ${colourName(answer).toLowerCase()} one!`
-      : "Here's who rides in the empty carriage!";
-  return `${who} Here comes the next train.`;
+      ? text.revealColour(colourName(answer, locale))
+      : text.revealGap;
+  return `${who} ${text.nextTrain}`;
 }

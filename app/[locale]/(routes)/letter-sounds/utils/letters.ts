@@ -1,8 +1,15 @@
+import type { Locale } from "@/app/i18n/locales";
 import type { LetterCase } from "../constants/config";
 
-export const ALPHABET: ReadonlyArray<string> = Object.freeze(
-  "abcdefghijklmnopqrstuvwxyz".split("")
-);
+/**
+ * Letters offered as distractors. Portuguese leaves out h (silent at the
+ * start of a word) and k, w and y (only in borrowed words).
+ */
+export const ALPHABET: Readonly<Record<Locale, ReadonlyArray<string>>> =
+  Object.freeze({
+    en: Object.freeze("abcdefghijklmnopqrstuvwxyz".split("")),
+    pt: Object.freeze("abcdefgijlmnopqrstuvxz".split("")),
+  });
 
 /** Letters that make the same first sound, so one never distracts from another. */
 const SOUND_ALIKES: ReadonlyArray<ReadonlyArray<string>> = [["c", "k", "q"]];
@@ -19,8 +26,4 @@ export function firstLetter(word: string): string {
 
 export function withCase(letter: string, letterCase: LetterCase): string {
   return letterCase === "upper" ? letter.toUpperCase() : letter.toLowerCase();
-}
-
-export function capitalise(word: string): string {
-  return word.charAt(0).toUpperCase() + word.slice(1);
 }

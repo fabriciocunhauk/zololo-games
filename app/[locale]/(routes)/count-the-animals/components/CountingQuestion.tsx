@@ -1,5 +1,8 @@
+"use client";
 import AnimalArt from "@/app/components/animals/AnimalArt";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import type { Animal } from "../constants/animals";
+import { COUNTING_TEXT } from "../constants/text";
 
 type CountingQuestionProps = {
   animal: Animal;
@@ -17,6 +20,10 @@ export default function CountingQuestion({
   canRecount,
   onCountAgain,
 }: CountingQuestionProps) {
+  const locale = useLocale();
+  const text = COUNTING_TEXT[locale];
+  const names = animal.names[locale];
+
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <div className="flex items-center gap-3">
@@ -25,18 +32,18 @@ export default function CountingQuestion({
           data-testid="question"
           className="font-display text-3xl sm:text-5xl"
         >
-          How many {animal.plural}?
+          {text.question(names)}
         </h2>
       </div>
       <div className="flex min-h-11 flex-wrap items-center justify-center gap-3">
         <p className="text-base sm:text-lg" aria-live="polite">
           {countedSoFar === 0
-            ? `Tap each ${animal.name} to count it.`
-            : `You counted ${countedSoFar}.`}
+            ? text.tapEach(names)
+            : text.countedSoFar(countedSoFar)}
         </p>
         {canRecount && countedSoFar > 0 && (
           <button type="button" onClick={onCountAgain} className={smallButton}>
-            Count again
+            {text.countAgain}
           </button>
         )}
       </div>

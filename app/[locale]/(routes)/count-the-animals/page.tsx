@@ -1,11 +1,7 @@
-import type { Metadata } from "next";
+import { gameMetadata } from "@/app/i18n/pageMetadata";
 import CountingGame from "./components/CountingGame";
 
-export const metadata: Metadata = {
-  title: "Count the Animals",
-  description:
-    "Tap each animal to count it, then pick the right number. Three levels, counting up to 10.",
-};
+export const generateMetadata = gameMetadata("count-the-animals");
 
 export default function CountTheAnimalsPage() {
   return <CountingGame />;

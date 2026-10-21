@@ -1,5 +1,7 @@
+"use client";
 import type { CSSProperties, ReactNode } from "react";
 import type { Difficulty } from "@/app/constants/difficulty";
+import { useMessages } from "@/app/i18n/LocaleProvider";
 import { playSound } from "@/app/utils/soundPlayer";
 import Container from "./Container";
 import DifficultyPicker from "./DifficultyPicker";
@@ -29,6 +31,8 @@ export default function GameIntro({
   onDifficultyChange,
   onStart,
 }: GameIntroProps) {
+  const { intro } = useMessages();
+
   return (
     <main className="flex-1 pt-24 pb-20 sm:pt-32">
       <ScrollToTop />
@@ -54,7 +58,7 @@ export default function GameIntro({
             id="difficulty-heading"
             className="font-display text-2xl sm:text-3xl"
           >
-            Who&apos;s playing?
+            {intro.whoIsPlaying}
           </h2>
           <DifficultyPicker value={difficulty} onChange={onDifficultyChange} />
         </section>
@@ -68,7 +72,7 @@ export default function GameIntro({
           style={startStyle}
           className="toy-block px-10 py-4 font-display text-2xl"
         >
-          Start playing
+          {intro.start}
         </button>
       </Container>
     </main>

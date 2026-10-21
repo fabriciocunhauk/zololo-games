@@ -1,6 +1,7 @@
 "use client";
 import { useRef, type CSSProperties, type KeyboardEvent } from "react";
 import { DIFFICULTIES, type Difficulty } from "@/app/constants/difficulty";
+import { useMessages } from "@/app/i18n/LocaleProvider";
 import { classNames } from "@/app/utils/appearance";
 
 type DifficultyPickerProps = {
@@ -13,6 +14,7 @@ export default function DifficultyPicker({
   value,
   onChange,
 }: DifficultyPickerProps) {
+  const text = useMessages().difficulty;
   const tiles = useRef<(HTMLButtonElement | null)[]>([]);
 
   const onKeyDown = (event: KeyboardEvent, idx: number) => {
@@ -37,6 +39,7 @@ export default function DifficultyPicker({
     >
       {DIFFICULTIES.map((option, idx) => {
         const isSelected = option.id === value;
+        const { label, ages, agesSpoken } = text[option.id];
         const style: CSSProperties & { "--tile": string; "--depth": string } =
           {
             "--tile": isSelected ? option.tile : "white",
@@ -51,7 +54,7 @@ export default function DifficultyPicker({
             type="button"
             role="radio"
             aria-checked={isSelected}
-            aria-label={`${option.label}, ${option.agesSpoken}`}
+            aria-label={`${label}, ${agesSpoken}`}
             tabIndex={isSelected ? 0 : -1}
             onClick={() => onChange(option.id)}
             onKeyDown={(event) => onKeyDown(event, idx)}
@@ -70,10 +73,10 @@ export default function DifficultyPicker({
               </span>
             )}
             <span className="font-display text-xl sm:text-3xl">
-              {option.label}
+              {label}
             </span>
             <span className="text-sm font-bold sm:text-base">
-              {option.ages}
+              {ages}
             </span>
           </button>
         );

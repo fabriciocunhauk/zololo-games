@@ -5,19 +5,22 @@ import { MONSTERS, type Monster } from "@/app/components/monsters/monsters";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { useLocale } from "@/app/i18n/LocaleProvider";
+import type { Locale } from "@/app/i18n/locales";
 import { playSound } from "@/app/utils/soundPlayer";
 import { resultSound } from "@/app/utils/sounds";
 import { randomInt } from "@/app/utils/randomInt";
 import { PATTERN_CONFIG, PATTERN_DIFFICULTY } from "../constants/config";
+import { PATTERN_TEXT } from "../constants/text";
 import { revealText, rightText } from "../utils/feedbackText";
 import { generatePattern, type PatternRound } from "../utils/generatePattern";
 import { colourVariants, monsterResemblance } from "../utils/monsterFaces";
 
-function buildRound(difficulty: Difficulty, level: number) {
+function buildRound(difficulty: Difficulty, level: number, locale: Locale) {
   const { faces, levels, ...settings } = PATTERN_DIFFICULTY[difficulty];
   const pool =
     faces === "colours"
-      ? colourVariants(MONSTERS[randomInt(0, MONSTERS.length - 1)])
+      ? colourVariants(MONSTERS[randomInt(0, MONSTERS.length - 1)], locale)
       : MONSTERS;
   return generatePattern(
     { ...settings, length: levels[level] },
@@ -37,6 +40,8 @@ export function usePatternTrainGame() {
   const [selected, setSelected] = useState<Monster | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const { schedule, clearAll } = useSafeTimeout();
+  const locale = useLocale();
+  const text = PATTERN_TEXT[locale];
 
   const settings = PATTERN_DIFFICULTY[difficulty ?? "easy"];
   const progress = useLevelProgress({
@@ -44,13 +49,16 @@ export function usePatternTrainGame() {
     roundsPerLevel: PATTERN_CONFIG.roundsPerLevel,
   });
 
-  const startRound = useCallback((forDifficulty: Difficulty, level: number) => {
-    setRound(buildRound(forDifficulty, level));
-    setTrainId((id) => id + 1);
-    setTried(null);
-    setSelected(null);
-    setFeedback(null);
-  }, []);
+  const startRound = useCallback(
+    (forDifficulty: Difficulty, level: number) => {
+      setRound(buildRound(forDifficulty, level, locale));
+      setTrainId((id) => id + 1);
+      setTried(null);
+      setSelected(null);
+      setFeedback(null);
+    },
+    [locale]
+  );
 
   const start = useCallback(
     (chosen: Difficulty) => {
@@ -76,7 +84,7 @@ export function usePatternTrainGame() {
         setSelected(choice);
         const next = progress.recordCorrect();
         playSound(resultSound(next));
-        setFeedback({ tone: "success", text: rightText(next) });
+        setFeedback({ tone: "success", text: rightText(next, locale) });
         schedule(
           () => startRound(difficulty, next.level),
           PATTERN_CONFIG.nextRoundDelayMs
@@ -87,10 +95,7 @@ export function usePatternTrainGame() {
       playSound("wrong");
       if (tried === null) {
         setTried(choice.name);
-        setFeedback({
-          tone: "error",
-          text: "Not quite — look at the pattern again!",
-        });
+        setFeedback({ tone: "error", text: text.tryAgain });
         return;
       }
 
@@ -98,7 +103,7 @@ export function usePatternTrainGame() {
       setSelected(choice);
       setFeedback({
         tone: "info",
-        text: revealText(round.answer, settings.faces),
+        text: revealText(round.answer, settings.faces, locale),
       });
       schedule(
         () => startRound(difficulty, progress.level),
@@ -111,6 +116,8 @@ export function usePatternTrainGame() {
       selected,
       tried,
       settings,
+      locale,
+      text,
       progress,
       schedule,
       startRound,

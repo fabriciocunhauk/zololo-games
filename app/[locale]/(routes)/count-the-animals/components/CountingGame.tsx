@@ -7,7 +7,9 @@ import GameIntro from "@/app/components/GameIntro";
 import HowToPlay from "@/app/components/HowToPlay";
 import StarMeter from "@/app/components/StarMeter";
 import { useDifficulty } from "@/app/hooks/useDifficulty";
-import { COUNTING_HOW_TO_PLAY } from "../constants/howToPlay";
+import { useLocale, useMessages } from "@/app/i18n/LocaleProvider";
+import { countingHowToPlay } from "../constants/howToPlay";
+import { COUNTING_TEXT } from "../constants/text";
 import { useCountingGame } from "../hooks/useCountingGame";
 import AnimalField from "./AnimalField";
 import AnimalParade from "./AnimalParade";
@@ -16,14 +18,18 @@ import CountingQuestion from "./CountingQuestion";
 export default function CountingGame() {
   const game = useCountingGame();
   const [difficulty, setDifficulty] = useDifficulty("count-the-animals");
+  const locale = useLocale();
+  const title = useMessages().games["count-the-animals"].name;
+  const text = COUNTING_TEXT[locale];
+  const howToPlay = <HowToPlay {...countingHowToPlay(locale)} />;
 
   if (!game.difficulty || !game.round) {
     return (
       <GameIntro
         hero={<AnimalParade />}
-        title="Count the Animals"
-        blurb="Ducks, cats, owls and more are waiting to be counted. Tap each animal to count it, then pick the right number!"
-        howToPlay={<HowToPlay {...COUNTING_HOW_TO_PLAY} />}
+        title={title}
+        blurb={text.blurb}
+        howToPlay={howToPlay}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
         onStart={() => game.start(difficulty)}
@@ -43,7 +49,7 @@ export default function CountingGame() {
         }}
       >
         <GameHeader
-          title="Count the Animals"
+          title={title}
           difficulty={game.difficulty}
           onChangeDifficulty={game.quit}
           meter={
@@ -51,10 +57,10 @@ export default function CountingGame() {
               level={game.level}
               stars={game.stars}
               total={game.roundsPerLevel}
-              caption={`up to ${game.levelMax}`}
+              caption={text.caption(game.levelMax)}
             />
           }
-          howToPlay={<HowToPlay {...COUNTING_HOW_TO_PLAY} />}
+          howToPlay={howToPlay}
         />
         <CountingQuestion
           animal={round.animal}

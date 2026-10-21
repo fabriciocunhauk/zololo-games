@@ -1,3 +1,6 @@
+"use client";
+import { useLocale } from "@/app/i18n/LocaleProvider";
+import { FROG_JUMP_TEXT } from "../constants/text";
 import type { JumpProblem } from "../utils/generateJumpProblem";
 import FrogArt from "./FrogArt";
 
@@ -10,7 +13,7 @@ export default function ProblemDisplay({
   operation,
   jump,
 }: Pick<JumpProblem, "start" | "operation" | "jump">) {
-  const hops = `${jump} ${jump === 1 ? "pad" : "pads"}`;
+  const text = FROG_JUMP_TEXT[useLocale()];
 
   return (
     <div className="flex flex-col items-center gap-3 text-center">
@@ -20,16 +23,15 @@ export default function ProblemDisplay({
           data-testid="jump-problem"
           className="font-display text-[clamp(1.6rem,7vw,3rem)] leading-tight"
         >
-          {"Start at "}
+          {text.problem.start}
           <span className={`${chip} bg-sun`}>{start}</span>
-          {", jump "}
+          {text.problem.jump}
           <span className={`${chip} bg-white`}>{`${operation} ${jump}`}</span>
-          {"."}
+          {text.problem.end}
         </h2>
       </div>
       <p className="text-base sm:text-lg">
-        {operation === "+" ? `Hop forward ${hops}.` : `Hop back ${hops}.`} Where
-        does the frog land?
+        {text.hint(operation, jump)}
       </p>
     </div>
   );

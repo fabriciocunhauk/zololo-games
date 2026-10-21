@@ -8,7 +8,9 @@ import HowToPlay from "@/app/components/HowToPlay";
 import StarMeter from "@/app/components/StarMeter";
 import Stat from "@/app/components/Stat";
 import { useDifficulty } from "@/app/hooks/useDifficulty";
-import { BUBBLE_POP_HOW_TO_PLAY } from "../constants/howToPlay";
+import { useLocale, useMessages } from "@/app/i18n/LocaleProvider";
+import { bubblePopHowToPlay } from "../constants/howToPlay";
+import { BUBBLE_POP_TEXT } from "../constants/text";
 import { useBubblePopGame } from "../hooks/useBubblePopGame";
 import BubbleCluster from "./BubbleCluster";
 import BubbleField from "./BubbleField";
@@ -18,14 +20,17 @@ import MathProblem from "./MathProblem";
 export default function BubblePopGame() {
   const game = useBubblePopGame();
   const [difficulty, setDifficulty] = useDifficulty("bubble-pop");
+  const locale = useLocale();
+  const title = useMessages().games["bubble-pop"].name;
+  const text = BUBBLE_POP_TEXT[locale];
 
   if (!game.difficulty) {
     return (
       <GameIntro
         hero={<BubbleCluster />}
-        title="Bubble Pop"
-        blurb="Number bubbles are floating up! Work out the sum, then pop the bubble with the right answer before it drifts away."
-        howToPlay={<HowToPlay {...BUBBLE_POP_HOW_TO_PLAY} />}
+        title={title}
+        blurb={text.blurb}
+        howToPlay={<HowToPlay {...bubblePopHowToPlay(locale)} />}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
         onStart={() => game.start(difficulty)}
@@ -42,7 +47,7 @@ export default function BubblePopGame() {
         }}
       >
         <GameHeader
-          title="Bubble Pop"
+          title={title}
           difficulty={game.difficulty}
           onChangeDifficulty={game.quit}
           meter={
@@ -52,9 +57,9 @@ export default function BubblePopGame() {
               total={game.roundsPerLevel}
             />
           }
-          stats={<Stat label="Score" value={game.score} testId="score" />}
+          stats={<Stat label={text.score} value={game.score} testId="score" />}
           actions={
-            <HeaderButton onClick={game.restart}>Reset game</HeaderButton>
+            <HeaderButton onClick={game.restart}>{text.reset}</HeaderButton>
           }
         />
         <MathProblem problem={game.problem} roundId={game.roundId} />

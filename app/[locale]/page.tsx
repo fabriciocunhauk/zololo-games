@@ -1,27 +1,43 @@
+import type { Metadata } from "next";
 import Image from "next/image";
-import Container from "./components/Container";
-import GameCard from "./components/GameCard";
-import { GAMES } from "./constants/games";
+import Container from "@/app/components/Container";
+import GameCard from "@/app/components/GameCard";
+import { GAMES } from "@/app/constants/games";
+import type { Locale } from "@/app/i18n/locales";
+import { MESSAGES } from "@/app/i18n/messages";
+import { pageMetadata } from "@/app/i18n/pageMetadata";
 import logo from "@/public/images/brand/zololo-logo.png";
 
-export default function Home() {
+type HomeProps = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({
+  params,
+}: HomeProps): Promise<Metadata> {
+  const locale = (await params).locale as Locale;
+  return pageMetadata(locale, "/", {
+    description: MESSAGES[locale].site.description,
+  });
+}
+
+export default async function Home({ params }: HomeProps) {
+  const locale = (await params).locale as Locale;
+  const text = MESSAGES[locale];
+
   return (
     <main className="flex-1 pt-28 pb-20 sm:pt-36">
       <Container classes={{ container: "flex flex-col gap-12 px-4 sm:px-10" }}>
         <header className="flex flex-col-reverse items-start gap-6 md:flex-row md:items-center md:justify-between">
           <div className="max-w-3xl">
             <h1 className="font-display text-[clamp(2.5rem,7vw,5rem)] leading-[0.95] text-balance">
-              Tap a game to play.
+              {text.home.heading}
             </h1>
             <p className="mt-5 max-w-2xl text-lg sm:text-xl text-ink/80">
-              Short games for counting, sums, letters, shapes and more. Pick
-              Easy (4–5), Medium (6–7) or Hard (8+) in every game. Free to play,
-              nothing to sign up for.
+              {text.home.blurb}
             </p>
           </div>
           <Image
             src={logo}
-            alt="Zololo Games"
+            alt={text.site.logoAlt}
             priority
             sizes="(min-width: 768px) 28rem, 90vw"
             className="w-full max-w-xs self-center sm:max-w-sm md:max-w-md md:shrink-0"
@@ -33,6 +49,7 @@ export default function Home() {
             <li key={game.href}>
               <GameCard
                 game={game}
+                locale={locale}
                 tilt={idx % 2 === 0 ? "left" : "right"}
               />
             </li>

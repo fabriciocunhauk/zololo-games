@@ -1,4 +1,5 @@
 import type { Monster } from "@/app/components/monsters/monsters";
+import type { Locale } from "@/app/i18n/locales";
 import { randomInt } from "@/app/utils/randomInt";
 import {
   ATTRIBUTE_VALUES,
@@ -10,8 +11,6 @@ export type OddOneOutRound = {
   tiles: Monster[];
   oddIndex: number;
   attribute: OddAttribute;
-  /** Kid words for what makes the odd one different, e.g. "It has 3 eyes." */
-  description: string;
 };
 
 function pick<T>(items: ReadonlyArray<T>): T {
@@ -22,10 +21,10 @@ function pick<T>(items: ReadonlyArray<T>): T {
 function changeAttribute<K extends OddAttribute>(
   monster: Monster,
   attribute: K
-): { odd: Monster; value: Monster[K] } {
+): Monster {
   const values = ATTRIBUTE_VALUES[attribute] as ReadonlyArray<Monster[K]>;
   const value = pick(values.filter((v) => v !== monster[attribute]));
-  return { odd: { ...monster, [attribute]: value }, value };
+  return { ...monster, [attribute]: value };
 }
 
 /**
@@ -42,17 +41,20 @@ export function makeOddOneOut(
   const pool = monsters.filter((m) => m.name !== avoid);
   const base = pick(pool.length > 0 ? pool : monsters);
   const attribute = pick(attributes);
-  const { odd, value } = changeAttribute(base, attribute);
+  const odd = changeAttribute(base, attribute);
   const oddIndex = randomInt(0, count - 1);
   const tiles = Array.from({ length: count }, (_, idx) =>
     idx === oddIndex ? odd : { ...base }
   );
-  return {
-    tiles,
-    oddIndex,
-    attribute,
-    description: describeAttribute(attribute, value),
-  };
+  return { tiles, oddIndex, attribute };
+}
+
+/** Kid words for what makes the odd one different, e.g. "It has 3 eyes." */
+export function describeOdd(
+  { tiles, oddIndex, attribute }: OddOneOutRound,
+  locale: Locale
+): string {
+  return describeAttribute(locale, attribute, tiles[oddIndex][attribute]);
 }
 
 /** A stable serialisation of how a monster looks (its name is ignored). */

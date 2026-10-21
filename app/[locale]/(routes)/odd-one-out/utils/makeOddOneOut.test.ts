@@ -6,7 +6,8 @@ import {
   type OddAttribute,
 } from "../constants/attributes";
 import { ODD_DIFFICULTY } from "../constants/config";
-import { makeOddOneOut, monsterLook } from "./makeOddOneOut";
+import { LOCALES } from "@/app/i18n/locales";
+import { describeOdd, makeOddOneOut, monsterLook } from "./makeOddOneOut";
 
 const FEATURES = Object.keys(ATTRIBUTE_VALUES) as OddAttribute[];
 
@@ -24,7 +25,7 @@ describe("makeOddOneOut", () => {
     ({ count, attributes }) => {
       for (let i = 0; i < 200; i++) {
         const round = makeOddOneOut(MONSTERS, attributes, count);
-        const { tiles, oddIndex, attribute, description } = round;
+        const { tiles, oddIndex, attribute } = round;
 
         expect(tiles).toHaveLength(count);
         expect(oddIndex).toBeGreaterThanOrEqual(0);
@@ -40,11 +41,15 @@ describe("makeOddOneOut", () => {
         expect(differingFeatures(odd, others[0])).toEqual([attribute]);
         expect(ATTRIBUTE_VALUES[attribute]).toContain(odd[attribute]);
 
-        const words = ATTRIBUTE_DESCRIPTIONS[attribute] as Record<
-          string,
-          string
-        >;
-        expect(description).toBe(words[String(odd[attribute])]);
+        for (const locale of LOCALES) {
+          const words = ATTRIBUTE_DESCRIPTIONS[locale][attribute] as Record<
+            string,
+            string
+          >;
+          expect(describeOdd(round, locale)).toBe(
+            words[String(odd[attribute])]
+          );
+        }
       }
     }
   );
@@ -57,24 +62,35 @@ describe("makeOddOneOut", () => {
     }
   });
 
-  it("gives every value its own description", () => {
+  it.each(LOCALES)("gives every value its own %s description", (locale) => {
     for (const feature of FEATURES) {
-      const words = ATTRIBUTE_DESCRIPTIONS[feature] as Record<string, string>;
+      const words = ATTRIBUTE_DESCRIPTIONS[locale][feature] as Record<
+        string,
+        string
+      >;
       const values = ATTRIBUTE_VALUES[feature].map(String);
       expect(Object.keys(words).sort()).toEqual([...values].sort());
       expect(new Set(Object.values(words)).size).toBe(values.length);
     }
   });
 
-  it("describes eye counts with the number", () => {
+  it.each(LOCALES)("describes eye counts with the number in %s", (locale) => {
     for (let i = 0; i < 50; i++) {
-      const { tiles, oddIndex, description } = makeOddOneOut(
-        MONSTERS,
-        ["eyes"],
-        6
+      const round = makeOddOneOut(MONSTERS, ["eyes"], 6);
+      expect(describeOdd(round, locale)).toContain(
+        String(round.tiles[round.oddIndex].eyes)
       );
-      expect(description).toContain(String(tiles[oddIndex].eyes));
     }
+  });
+
+  it("describes in Portuguese with masculine agreement", () => {
+    const round = {
+      tiles: [MONSTERS[0], { ...MONSTERS[0], color: "grape" as const }],
+      oddIndex: 1,
+      attribute: "color" as const,
+    };
+    expect(describeOdd(round, "en")).toBe("It is purple.");
+    expect(describeOdd(round, "pt")).toBe("Este é roxo.");
   });
 
   it("skips the monster to avoid", () => {

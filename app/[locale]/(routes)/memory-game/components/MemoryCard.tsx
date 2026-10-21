@@ -1,6 +1,8 @@
 "use client";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Monster } from "@/app/components/monsters/monsters";
+import { useLocale } from "@/app/i18n/LocaleProvider";
+import { MEMORY_TEXT } from "../constants/text";
 import type { CardState } from "../hooks/useMemoryGame";
 import CardBack from "./CardBack";
 import CardFront from "./CardFront";
@@ -22,11 +24,12 @@ export default function MemoryCard({
   onFlip,
 }: MemoryCardProps) {
   const reduceMotion = useReducedMotion();
+  const text = MEMORY_TEXT[useLocale()];
   const isFaceUp = state !== "down";
   const label = !isFaceUp
-    ? `Card ${position}, face down`
+    ? text.faceDown(position)
     : state === "matched"
-      ? `${monster.name}, matched`
+      ? text.matched(monster.name)
       : monster.name;
 
   return (

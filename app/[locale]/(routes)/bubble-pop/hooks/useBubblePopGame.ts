@@ -4,9 +4,11 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { playSound } from "@/app/utils/soundPlayer";
 import { resultSound } from "@/app/utils/sounds";
 import { BUBBLE_POP_CONFIG, BUBBLE_POP_DIFFICULTY } from "../constants/config";
+import { BUBBLE_POP_TEXT } from "../constants/text";
 import { createBubbles, type Bubble } from "../utils/createBubbles";
 import {
   generateMathProblem,
@@ -31,6 +33,7 @@ export function useBubblePopGame() {
   // Read by taps: leaving bubbles keep a stale `isLocked` while they fade.
   const lockedRef = useRef(true);
   const { schedule, clearAll } = useSafeTimeout();
+  const text = BUBBLE_POP_TEXT[useLocale()];
 
   const lock = useCallback((locked: boolean) => {
     lockedRef.current = locked;
@@ -134,14 +137,7 @@ export function useBubblePopGame() {
         playSound("pop");
         playSound(resultSound(next));
         setScore((prev) => prev + BUBBLE_POP_CONFIG.points);
-        setFeedback({
-          tone: "success",
-          text: next.levelUp
-            ? "🎉 Correct! Level up: the bubbles float faster now!"
-            : next.stars === 0
-              ? "🎉 Correct! Another row of stars!"
-              : "🎉 Correct!",
-        });
+        setFeedback({ tone: "success", text: text.right(next) });
         schedule(
           () => startRound(difficulty, next.level),
           BUBBLE_POP_CONFIG.nextRoundDelayMs
@@ -151,16 +147,13 @@ export function useBubblePopGame() {
 
       // Wrong: say the answer before the next sum floats in.
       playSound("wrong");
-      setFeedback({
-        tone: "error",
-        text: `Not quite! ${solveText(problem)}.`,
-      });
+      setFeedback({ tone: "error", text: text.wrong(solveText(problem)) });
       schedule(
         () => startRound(difficulty, progress.level),
         BUBBLE_POP_CONFIG.wrongHoldMs
       );
     },
-    [difficulty, problem, lock, progress, schedule, startRound]
+    [difficulty, problem, lock, progress, text, schedule, startRound]
   );
 
   return {

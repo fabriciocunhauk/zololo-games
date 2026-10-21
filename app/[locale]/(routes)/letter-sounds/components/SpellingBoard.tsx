@@ -2,7 +2,9 @@
 import { motion, useAnimate, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, type CSSProperties } from "react";
 import { useFocusRescue } from "@/app/hooks/useFocusRescue";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { classNames } from "@/app/utils/appearance";
+import { LETTER_TEXT } from "../constants/text";
 import type { Shake } from "../hooks/useLetterSoundsGame";
 
 type SpellingBoardProps = {
@@ -33,6 +35,7 @@ type BankTileProps = {
 function BankTile({ letter, used, disabled, shakeKey, onPick }: BankTileProps) {
   const [scope, animate] = useAnimate<HTMLSpanElement>();
   const reduceMotion = useReducedMotion();
+  const text = LETTER_TEXT[useLocale()].board;
 
   useEffect(() => {
     if (!shakeKey || reduceMotion || !scope.current) return;
@@ -54,7 +57,7 @@ function BankTile({ letter, used, disabled, shakeKey, onPick }: BankTileProps) {
           if (!isLocked) onPick();
         }}
         aria-disabled={isLocked}
-        aria-label={used ? `${letter}, used` : letter}
+        aria-label={used ? text.used(letter) : letter}
         style={tileStyle}
         className={classNames(
           "toy-block flex h-16 w-16 items-center justify-center font-display text-3xl sm:h-20 sm:w-20 sm:text-4xl",
@@ -78,13 +81,17 @@ export default function SpellingBoard({
   disabled,
   onPick,
 }: SpellingBoardProps) {
+  const text = LETTER_TEXT[useLocale()].board;
   const complete = placed.length === word.length;
   const bankArea = useRef<HTMLDivElement>(null);
   useFocusRescue(bankArea);
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
-      <ol aria-label="Your spelling" className="flex gap-3 sm:gap-4">
+      <ol
+        aria-label={text.spelling}
+        className="flex gap-2 min-[360px]:gap-3 sm:gap-4"
+      >
         {Array.from(word, (_, idx) => {
           const letter = placed[idx];
           const isNext = idx === placed.length;
@@ -93,7 +100,8 @@ export default function SpellingBoard({
               key={idx}
               data-testid="slot"
               className={classNames(
-                "flex h-16 w-16 items-center justify-center rounded-2xl border-[3px] border-ink font-display text-3xl sm:h-20 sm:w-20 sm:text-4xl",
+                // Small phones: four-letter Portuguese words must fit in 288px.
+                "flex size-14 items-center justify-center rounded-2xl border-[3px] border-ink font-display text-3xl min-[360px]:size-16 sm:size-20 sm:text-4xl",
                 letter
                   ? classNames(
                       "shadow-[0_4px_0_var(--color-ink)] motion-safe:animate-[pop_200ms_ease-out]",
@@ -103,7 +111,7 @@ export default function SpellingBoard({
                 isNext && "bg-tangerine/30"
               )}
             >
-              {letter ?? <span className="sr-only">empty</span>}
+              {letter ?? <span className="sr-only">{text.empty}</span>}
             </li>
           );
         })}
@@ -112,7 +120,7 @@ export default function SpellingBoard({
       <div
         ref={bankArea}
         role="group"
-        aria-label="Letter blocks"
+        aria-label={text.bank}
         className="grid grid-cols-3 gap-3 sm:grid-cols-6 sm:gap-4"
       >
         {/* Keyed by place, so a focused tile stays mounted into the next round. */}

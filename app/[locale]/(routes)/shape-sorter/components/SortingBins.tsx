@@ -2,8 +2,10 @@
 import { motion, useAnimate, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, type CSSProperties } from "react";
 import { useFocusRescue } from "@/app/hooks/useFocusRescue";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { classNames } from "@/app/utils/appearance";
 import type { Bin } from "../constants/bins";
+import { SHAPE_TEXT } from "../constants/text";
 import type { DroppedShape, Shake } from "../hooks/useShapeSorterGame";
 import BinPicture from "./BinPicture";
 import ShapeArt from "./ShapeArt";
@@ -33,6 +35,7 @@ export default function SortingBins({
   busy,
   onSort,
 }: SortingBinsProps) {
+  const text = SHAPE_TEXT[useLocale()];
   const area = useRef<HTMLDivElement>(null);
   useFocusRescue(area);
 
@@ -40,7 +43,7 @@ export default function SortingBins({
     <div
       ref={area}
       role="group"
-      aria-label="Sorting bins"
+      aria-label={text.bins}
       className={classNames(
         "grid w-full gap-3 pt-3 sm:gap-5",
         columns[bins.length] ?? "grid-cols-2"
@@ -86,6 +89,8 @@ function SortingBin({
   onSort,
 }: SortingBinProps) {
   const reduceMotion = useReducedMotion();
+  const text = SHAPE_TEXT[useLocale()];
+  const label = text.binLabel(bin.name);
   // Shake a wrapper so the toy-block's own hover/press transforms keep working.
   const [scope, animate] = useAnimate<HTMLDivElement>();
 
@@ -103,7 +108,7 @@ function SortingBin({
       <button
         type="button"
         data-bin={bin.id}
-        aria-label={`${bin.label} bin, ${count} sorted`}
+        aria-label={text.binAria(label, count)}
         aria-disabled={busy}
         onClick={() => onSort(bin.id)}
         style={binStyle}
@@ -117,7 +122,7 @@ function SortingBin({
         </span>
         <BinPicture picture={bin.picture} className="w-10 sm:w-12" />
         <span className="font-display text-base leading-tight sm:text-xl">
-          {bin.label}
+          {label}
         </span>
         <span className="flex h-12 w-full items-center justify-center rounded-xl border-[3px] border-dashed border-ink/40 bg-ink/10 sm:h-14">
           {dropped && (

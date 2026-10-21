@@ -1,8 +1,10 @@
-import type { ReactNode } from "react";
-import type { HowToPlayStep } from "@/app/components/HowToPlay";
+import { withPictures } from "@/app/components/HowToPlay";
+import { Fragment, type ReactNode } from "react";
+import { MONSTERS } from "@/app/components/monsters/monsters";
+import type { Locale } from "@/app/i18n/locales";
 import CardBack from "../components/CardBack";
 import CardFront from "../components/CardFront";
-import { MONSTERS } from "@/app/components/monsters/monsters";
+import { MEMORY_TEXT } from "./text";
 
 const [pip, bop] = MONSTERS;
 
@@ -14,44 +16,29 @@ function MiniCard({ children }: { children: ReactNode }) {
   );
 }
 
-const steps: ReadonlyArray<HowToPlayStep> = [
-  {
-    text: "Tap a card to turn it over and meet a monster.",
-    picture: (
-      <MiniCard>
-        <CardBack />
-      </MiniCard>
-    ),
-  },
-  {
-    text: "Tap one more card. Is it the same monster? If not, both cards turn back.",
-    picture: (
-      <>
-        <MiniCard>
-          <CardFront monster={pip} isMatched={false} />
-        </MiniCard>
-        <MiniCard>
-          <CardFront monster={bop} isMatched={false} />
-        </MiniCard>
-      </>
-    ),
-  },
-  {
-    text: "Find every pair of twins to go up a level. Each level has more cards!",
-    picture: (
-      <>
-        <MiniCard>
-          <CardFront monster={pip} isMatched />
-        </MiniCard>
-        <MiniCard>
-          <CardFront monster={pip} isMatched />
-        </MiniCard>
-      </>
-    ),
-  },
+/** One picture per step, in the same order as the text's steps. */
+const pictures: ReadonlyArray<ReactNode> = [
+  <MiniCard key="flip">
+    <CardBack />
+  </MiniCard>,
+  <Fragment key="compare">
+    <MiniCard>
+      <CardFront monster={pip} isMatched={false} />
+    </MiniCard>
+    <MiniCard>
+      <CardFront monster={bop} isMatched={false} />
+    </MiniCard>
+  </Fragment>,
+  <Fragment key="pair">
+    <MiniCard>
+      <CardFront monster={pip} isMatched />
+    </MiniCard>
+    <MiniCard>
+      <CardFront monster={pip} isMatched />
+    </MiniCard>
+  </Fragment>,
 ];
 
-export const MEMORY_HOW_TO_PLAY = Object.freeze({
-  steps,
-  tip: "say each monster's name out loud when you see it. It helps you remember where it's hiding!",
-});
+export function memoryHowToPlay(locale: Locale) {
+  return withPictures(MEMORY_TEXT[locale].howToPlay, pictures);
+}

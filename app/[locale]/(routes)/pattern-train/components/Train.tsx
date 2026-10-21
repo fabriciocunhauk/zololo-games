@@ -1,6 +1,8 @@
 "use client";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Monster } from "@/app/components/monsters/monsters";
+import { useLocale } from "@/app/i18n/LocaleProvider";
+import { PATTERN_TEXT } from "../constants/text";
 import TrainCarriage from "./TrainCarriage";
 import TrainEngine from "./TrainEngine";
 
@@ -21,9 +23,11 @@ const CARRIAGE_SIZE = "w-14 sm:w-20";
  * small screens; each piece carries its own stretch of rail.
  */
 export function Train({ carriages, answer, solved }: TrainProps) {
+  const text = PATTERN_TEXT[useLocale()];
+
   return (
     <ol
-      aria-label="The pattern train"
+      aria-label={text.train}
       className="flex flex-wrap items-end justify-center gap-y-4"
     >
       <li aria-hidden className={ENGINE_SIZE}>
@@ -33,7 +37,7 @@ export function Train({ carriages, answer, solved }: TrainProps) {
         monster === null ? (
           <li key={idx} data-testid="gap" className={CARRIAGE_SIZE}>
             <span className="sr-only">
-              {solved ? answer.name : "Empty carriage"}
+              {solved ? answer.name : text.emptyCarriage}
             </span>
             <TrainCarriage monster={solved ? answer : null} gap />
           </li>

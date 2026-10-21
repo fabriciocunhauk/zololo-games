@@ -11,16 +11,6 @@ export const SHAPE_COLOURS = Object.freeze([
 
 export type ShapeColour = (typeof SHAPE_COLOURS)[number];
 
-export const COLOUR_NAMES: Readonly<Record<ShapeColour, string>> =
-  Object.freeze({
-    sun: "yellow",
-    sky: "blue",
-    leaf: "green",
-    "pink-primary": "pink",
-    tangerine: "orange",
-    grape: "purple",
-  });
-
 /** Spelled out in full so Tailwind sees every class. */
 export const FILL_CLASS: Readonly<Record<ShapeColour, string>> = Object.freeze({
   sun: "fill-sun",
@@ -55,8 +45,6 @@ export type ShapeKind =
 
 export type ShapeKindInfo = {
   family: ShapeFamily;
-  /** Spoken name, e.g. "right-angle triangle". */
-  name: string;
   /** Corner points in any units; null for a circle. One side per point. */
   outline: ReadonlyArray<Point> | null;
 };
@@ -70,10 +58,9 @@ function regularPolygon(sides: number): Point[] {
 
 export const SHAPE_KINDS: Readonly<Record<ShapeKind, ShapeKindInfo>> =
   Object.freeze({
-    circle: { family: "circle", name: "circle", outline: null },
+    circle: { family: "circle", outline: null },
     square: {
       family: "square",
-      name: "square",
       outline: [
         [0, 0],
         [1, 0],
@@ -83,7 +70,6 @@ export const SHAPE_KINDS: Readonly<Record<ShapeKind, ShapeKindInfo>> =
     },
     rectangle: {
       family: "rectangle",
-      name: "long rectangle",
       outline: [
         [0, 0],
         [2.3, 0],
@@ -93,12 +79,10 @@ export const SHAPE_KINDS: Readonly<Record<ShapeKind, ShapeKindInfo>> =
     },
     triangle: {
       family: "triangle",
-      name: "triangle",
       outline: regularPolygon(3),
     },
     "right-triangle": {
       family: "triangle",
-      name: "right-angle triangle",
       outline: [
         [0, 0],
         [0, 1],
@@ -107,7 +91,6 @@ export const SHAPE_KINDS: Readonly<Record<ShapeKind, ShapeKindInfo>> =
     },
     "scalene-triangle": {
       family: "triangle",
-      name: "pointy triangle",
       outline: [
         [0, 0],
         [1.5, 0.7],
@@ -116,10 +99,9 @@ export const SHAPE_KINDS: Readonly<Record<ShapeKind, ShapeKindInfo>> =
     },
     pentagon: {
       family: "pentagon",
-      name: "pentagon",
       outline: regularPolygon(5),
     },
-    hexagon: { family: "hexagon", name: "hexagon", outline: regularPolygon(6) },
+    hexagon: { family: "hexagon", outline: regularPolygon(6) },
   });
 
 export type ShapeSize = "small" | "medium" | "big";

@@ -7,73 +7,66 @@ import MemoryCardsArt from "@/app/components/gameArt/MemoryCardsArt";
 import OddOneOutArt from "@/app/components/gameArt/OddOneOutArt";
 import PatternTrainArt from "@/app/components/gameArt/PatternTrainArt";
 import ShapeSorterArt from "@/app/components/gameArt/ShapeSorterArt";
+import type { GameSlug } from "@/app/i18n/messages";
 
+/** A game's name and skill are in `MESSAGES[locale].games[slug]`. */
 export type Game = {
-  name: string;
+  slug: GameSlug;
+  /** Path without a locale prefix. */
   href: string;
   /** Home tile illustration. Decorative. */
   Art: ComponentType<{ className?: string }>;
-  /** What the game practises, shown as the tile's eyebrow. */
-  skill: string;
   /** CSS colour for the home tile. */
   tile: string;
 };
 
 export const GAMES: ReadonlyArray<Game> = Object.freeze([
   {
-    name: "Memory Cards",
+    slug: "memory-game",
     href: "/memory-game",
     Art: MemoryCardsArt,
-    skill: "Memory",
     tile: "var(--color-pink-primary)",
   },
   {
-    name: "Count the Animals",
+    slug: "count-the-animals",
     href: "/count-the-animals",
     Art: CountTheAnimalsArt,
-    skill: "Counting",
     tile: "var(--color-sky)",
   },
   {
-    name: "Frog Jump",
+    slug: "frog-jump",
     href: "/frog-jump",
     Art: FrogJumpArt,
-    skill: "Number line",
     tile: "var(--color-leaf)",
   },
   {
-    name: "Bubble Pop",
+    slug: "bubble-pop",
     href: "/bubble-pop",
     Art: BubblePopArt,
-    skill: "Adding & taking away",
     tile: "var(--color-sun)",
   },
   {
-    name: "Odd One Out",
+    slug: "odd-one-out",
     href: "/odd-one-out",
     Art: OddOneOutArt,
-    skill: "Spot the difference",
     tile: "var(--color-leaf)",
   },
   {
-    name: "Letter Sounds",
+    slug: "letter-sounds",
     href: "/letter-sounds",
     Art: LetterSoundsArt,
-    skill: "Phonics",
     tile: "var(--color-tangerine)",
   },
   {
-    name: "Shape Sorter",
+    slug: "shape-sorter",
     href: "/shape-sorter",
     Art: ShapeSorterArt,
-    skill: "Shapes",
     tile: "var(--color-sky)",
   },
   {
-    name: "Pattern Train",
+    slug: "pattern-train",
     href: "/pattern-train",
     Art: PatternTrainArt,
-    skill: "Patterns",
     tile: "var(--color-grape)",
   },
 ]);

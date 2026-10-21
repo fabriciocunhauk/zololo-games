@@ -3,8 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import { MONSTERS, type Monster } from "@/app/components/monsters/monsters";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { playSound } from "@/app/utils/soundPlayer";
 import { MEMORY_CONFIG, MEMORY_DIFFICULTY } from "../constants/config";
+import { MEMORY_TEXT } from "../constants/text";
 import {
   createShuffledDeck,
   type MemoryCardData,
@@ -15,9 +17,6 @@ export type CardState = "down" | "up" | "matched";
 
 /** Read out by the live region; `nonce` changes so a repeat is read again. */
 export type Announcement = { text: string; nonce: number };
-
-const MATCH = "It's a match!";
-const MISMATCH = "Not a match. They flip back.";
 
 export function useMemoryGame() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
@@ -30,6 +29,7 @@ export function useMemoryGame() {
   const [gameWon, setGameWon] = useState(false);
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const { schedule, clearAll } = useSafeTimeout();
+  const text = MEMORY_TEXT[useLocale()];
 
   const settings = MEMORY_DIFFICULTY[difficulty ?? "easy"];
   const maxLevel = lastLevel(settings);
@@ -84,7 +84,7 @@ export function useMemoryGame() {
       setMoves((m) => m + 1);
 
       if (deck[firstIdx].pairId === deck[idx].pairId) {
-        announce(MATCH);
+        announce(text.match);
         playSound("correct");
         schedule(() => {
           setMatched((prev) => [...prev, firstIdx, idx]);
@@ -92,7 +92,7 @@ export function useMemoryGame() {
           setIsBusy(false);
         }, MEMORY_CONFIG.matchDelayMs);
       } else {
-        announce(MISMATCH);
+        announce(text.mismatch);
         playSound("wrong");
         schedule(() => {
           setFlipped([]);
@@ -100,7 +100,7 @@ export function useMemoryGame() {
         }, settings.mismatchDelayMs);
       }
     },
-    [isBusy, flipped, matched, deck, settings, schedule, announce]
+    [isBusy, flipped, matched, deck, settings, text, schedule, announce]
   );
 
   const start = useCallback((chosen: Difficulty) => {

@@ -78,7 +78,10 @@ describe("binFor", () => {
       }
       const match = SIDE_BINS.filter((b) => b.id === bin);
       expect(match).toHaveLength(1);
-      expect(match[0].label).toBe(`${EXPECTED_SIDES[kind]} sides`);
+      expect(match[0].name).toEqual({
+        type: "sides",
+        sides: EXPECTED_SIDES[kind],
+      });
     }
   });
 });

@@ -2,6 +2,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { stripLocale } from "@/app/i18n/locales";
 
 type NavLinkProps = {
   href: string;
@@ -10,7 +11,7 @@ type NavLinkProps = {
 };
 
 export default function NavLink({ href, children, onNavigate }: NavLinkProps) {
-  const isActive = usePathname() === href;
+  const isActive = stripLocale(usePathname()) === stripLocale(href);
 
   return (
     <Link

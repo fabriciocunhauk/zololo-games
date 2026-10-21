@@ -14,10 +14,7 @@ export type ShapeSorterSettings = {
   sortBy: SortBy;
   /** How many bins to sort into. Colour bins are picked fresh each round. */
   binCount: number;
-  /** Asked above the conveyor belt. */
-  question: string;
-  /** Shown after the level in the star meter. */
-  caption: string;
+  /** The question and star-meter caption are in `SHAPE_TEXT[locale]`. */
   /** Each level adds variety: more kinds, sizes and tilts. */
   levels: ReadonlyArray<ShapeLevel>;
 };
@@ -30,8 +27,6 @@ export const SHAPE_DIFFICULTY: Readonly<
   easy: {
     sortBy: "colour",
     binCount: 2,
-    question: "What colour is it?",
-    caption: "by colour",
     levels: [
       { kinds: ["circle", "square"], sizes: ["medium"], maxRotation: 0 },
       { kinds: ["circle", "square"], sizes: ["medium"], maxRotation: 45 },
@@ -40,8 +35,6 @@ export const SHAPE_DIFFICULTY: Readonly<
   medium: {
     sortBy: "shape",
     binCount: 3,
-    question: "What shape is it?",
-    caption: "by shape",
     levels: [
       {
         kinds: ["circle", "square", "triangle"],
@@ -63,8 +56,6 @@ export const SHAPE_DIFFICULTY: Readonly<
   hard: {
     sortBy: "sides",
     binCount: 4,
-    question: "How many sides does it have?",
-    caption: "by sides",
     levels: [
       {
         kinds: ["triangle", "square", "pentagon", "hexagon"],

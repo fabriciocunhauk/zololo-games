@@ -5,10 +5,16 @@ import { MONSTERS } from "@/app/components/monsters/monsters";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { playSound } from "@/app/utils/soundPlayer";
 import { resultSound } from "@/app/utils/sounds";
 import { ODD_CONFIG, ODD_DIFFICULTY } from "../constants/config";
-import { makeOddOneOut, type OddOneOutRound } from "../utils/makeOddOneOut";
+import { ODD_TEXT } from "../constants/text";
+import {
+  describeOdd,
+  makeOddOneOut,
+  type OddOneOutRound,
+} from "../utils/makeOddOneOut";
 import { spottedText } from "../utils/spottedText";
 
 /** How the round ended: the child spotted it, or we showed them. */
@@ -23,6 +29,7 @@ export function useOddOneOutGame() {
   const [outcome, setOutcome] = useState<RoundOutcome>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const { schedule, clearAll } = useSafeTimeout();
+  const locale = useLocale();
 
   const settings = ODD_DIFFICULTY[difficulty ?? "easy"];
   const progress = useLevelProgress({
@@ -69,6 +76,7 @@ export function useOddOneOutGame() {
       if (wrongTaps.includes(position)) return;
       const baseName = round.tiles[(round.oddIndex + 1) % round.tiles.length]
         .name;
+      const description = describeOdd(round, locale);
 
       if (position === round.oddIndex) {
         const next = progress.recordCorrect();
@@ -77,7 +85,8 @@ export function useOddOneOutGame() {
         setFeedback({
           tone: "success",
           text: spottedText(
-            round.description,
+            locale,
+            description,
             next,
             settings.levels[next.level]
           ),
@@ -93,17 +102,14 @@ export function useOddOneOutGame() {
       const wrong = [...wrongTaps, position];
       setWrongTaps(wrong);
       if (wrong.length < ODD_CONFIG.maxWrongTaps) {
-        setFeedback({
-          tone: "error",
-          text: "Look closely — they all match except one!",
-        });
+        setFeedback({ tone: "error", text: ODD_TEXT[locale].tryAgain });
         return;
       }
 
       setOutcome("revealed");
       setFeedback({
         tone: "info",
-        text: `Here's the odd one! ${round.description}`,
+        text: ODD_TEXT[locale].reveal(description),
       });
       schedule(
         () => startRound(difficulty, progress.level, baseName),
@@ -117,6 +123,7 @@ export function useOddOneOutGame() {
       wrongTaps,
       progress,
       settings,
+      locale,
       schedule,
       startRound,
     ]

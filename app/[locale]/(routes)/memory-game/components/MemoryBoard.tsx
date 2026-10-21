@@ -1,8 +1,10 @@
 "use client";
 import { useRef, type CSSProperties } from "react";
 import { useFocusRescue } from "@/app/hooks/useFocusRescue";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import { classNames } from "@/app/utils/appearance";
 import type { Monster } from "@/app/components/monsters/monsters";
+import { MEMORY_TEXT } from "../constants/text";
 import type { CardState } from "../hooks/useMemoryGame";
 import type { MemoryCardData } from "../utils/createShuffledDeck";
 import { getBoardAspect, getBoardLayout } from "../utils/getBoardLayout";
@@ -24,6 +26,7 @@ function WinPanel({
   deck,
   nextStep,
 }: Pick<MemoryBoardProps, "deck" | "nextStep">) {
+  const text = MEMORY_TEXT[useLocale()];
   const found = deck
     .filter(
       (card, idx) => deck.findIndex((c) => c.pairId === card.pairId) === idx
@@ -43,7 +46,7 @@ function WinPanel({
         ))}
       </div>
       <p className="font-display text-3xl sm:text-4xl">
-        You found every pair! 🎉
+        {text.won} 🎉
       </p>
       <p className="text-lg text-ink/80">{nextStep}</p>
     </div>

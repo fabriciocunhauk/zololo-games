@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Atkinson_Hyperlegible, Bagel_Fat_One } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
-import MotionProvider from "./components/MotionProvider";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import "../globals.css";
+import MotionProvider from "@/app/components/MotionProvider";
+import Navbar from "@/app/components/Navbar";
+import Footer from "@/app/components/Footer";
+import LocaleProvider from "@/app/i18n/LocaleProvider";
+import { HTML_LANG, LOCALES, isLocale } from "@/app/i18n/locales";
+import { MESSAGES } from "@/app/i18n/messages";
 
 const displayFont = Bagel_Fat_One({
   variable: "--font-bagel",
@@ -18,26 +22,45 @@ const bodyFont = Atkinson_Hyperlegible({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: { default: "Zololo Games", template: "%s · Zololo Games" },
-  description:
-    "Short games for counting, sums, phonics, shapes, patterns and memory, for children aged 4 to 8 and up.",
+type LayoutProps = {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+// Only the listed languages exist; anything else is a 404.
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return LOCALES.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: Pick<LayoutProps, "params">): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const { site } = MESSAGES[locale];
+  return {
+    title: { default: site.name, template: `%s · ${site.name}` },
+    description: site.description,
+  };
+}
+
+export default async function RootLayout({ children, params }: LayoutProps) {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+
   return (
     <html
-      lang="en-GB"
+      lang={HTML_LANG[locale]}
       className={`${displayFont.variable} ${bodyFont.variable}`}
     >
       <body className="relative flex min-h-screen flex-col bg-paper font-sans text-ink antialiased">
-        <Navbar />
-        <MotionProvider>{children}</MotionProvider>
-        <Footer />
+        <LocaleProvider locale={locale}>
+          <Navbar locale={locale} />
+          <MotionProvider>{children}</MotionProvider>
+          <Footer locale={locale} />
+        </LocaleProvider>
         <Analytics />
       </body>
     </html>

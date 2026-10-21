@@ -1,11 +1,7 @@
-import type { Metadata } from "next";
+import { gameMetadata } from "@/app/i18n/pageMetadata";
 import PatternTrainGame from "./components/PatternTrainGame";
 
-export const metadata: Metadata = {
-  title: "Pattern Train",
-  description:
-    "Monsters ride the train in a pattern. Spot who belongs in the empty carriage and help the train chuff along.",
-};
+export const generateMetadata = gameMetadata("pattern-train");
 
 export default function PatternTrainPage() {
   return <PatternTrainGame />;

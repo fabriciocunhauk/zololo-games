@@ -6,7 +6,9 @@ import GameIntro from "@/app/components/GameIntro";
 import HowToPlay from "@/app/components/HowToPlay";
 import StarMeter from "@/app/components/StarMeter";
 import { useDifficulty } from "@/app/hooks/useDifficulty";
-import { ODD_HOW_TO_PLAY } from "../constants/howToPlay";
+import { useLocale, useMessages } from "@/app/i18n/LocaleProvider";
+import { oddOneOutHowToPlay } from "../constants/howToPlay";
+import { ODD_TEXT } from "../constants/text";
 import { useOddOneOutGame } from "../hooks/useOddOneOutGame";
 import MonsterGrid from "./MonsterGrid";
 import OddParade from "./OddParade";
@@ -14,14 +16,18 @@ import OddParade from "./OddParade";
 export default function OddOneOutGame() {
   const game = useOddOneOutGame();
   const [difficulty, setDifficulty] = useDifficulty("odd-one-out");
+  const locale = useLocale();
+  const title = useMessages().games["odd-one-out"].name;
+  const text = ODD_TEXT[locale];
+  const howToPlay = <HowToPlay {...oddOneOutHowToPlay(locale)} />;
 
   if (!game.difficulty || !game.round) {
     return (
       <GameIntro
         hero={<OddParade />}
-        title="Odd One Out"
-        blurb="The monsters are all dressed alike… except one! Look closely and tap the monster that's different."
-        howToPlay={<HowToPlay {...ODD_HOW_TO_PLAY} />}
+        title={title}
+        blurb={text.blurb}
+        howToPlay={howToPlay}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
         onStart={() => game.start(difficulty)}
@@ -40,7 +46,7 @@ export default function OddOneOutGame() {
         }}
       >
         <GameHeader
-          title="Odd One Out"
+          title={title}
           difficulty={game.difficulty}
           onChangeDifficulty={game.quit}
           meter={
@@ -48,16 +54,16 @@ export default function OddOneOutGame() {
               level={game.level}
               stars={game.stars}
               total={game.roundsPerLevel}
-              caption={`${game.count} monsters`}
+              caption={text.caption(game.count)}
             />
           }
-          howToPlay={<HowToPlay {...ODD_HOW_TO_PLAY} />}
+          howToPlay={howToPlay}
         />
         <p
           data-testid="question"
           className="font-display text-2xl sm:text-3xl text-center"
         >
-          Which monster is different?
+          {text.question}
         </p>
         <MonsterGrid
           roundId={round.id}

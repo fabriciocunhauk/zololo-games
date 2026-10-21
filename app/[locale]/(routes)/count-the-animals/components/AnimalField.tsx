@@ -1,5 +1,7 @@
 "use client";
+import { useLocale } from "@/app/i18n/LocaleProvider";
 import type { Animal } from "../constants/animals";
+import { COUNTING_TEXT } from "../constants/text";
 import AnimalTile from "./AnimalTile";
 
 type AnimalFieldProps = {
@@ -18,6 +20,10 @@ export default function AnimalField({
   disabled,
   onCount,
 }: AnimalFieldProps) {
+  const locale = useLocale();
+  const text = COUNTING_TEXT[locale];
+  const names = animal.names[locale];
+
   return (
     <div className="grid w-full max-w-lg grid-cols-5 gap-3 sm:gap-4 rounded-3xl border-[3px] border-ink bg-sky/30 p-3 sm:p-5">
       {Array.from({ length: total }, (_, position) => {
@@ -28,11 +34,7 @@ export default function AnimalField({
             key={position}
             type="button"
             data-testid="animal"
-            aria-label={
-              count === undefined
-                ? `${animal.name}, not counted yet`
-                : `${animal.name}, counted ${count}`
-            }
+            aria-label={text.animalLabel(names, count)}
             disabled={disabled}
             onClick={() => onCount(position)}
             className="rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-2 disabled:cursor-default enabled:motion-safe:active:translate-y-[3px] transition-transform"

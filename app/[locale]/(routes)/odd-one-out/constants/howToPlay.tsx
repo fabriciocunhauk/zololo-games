@@ -1,36 +1,26 @@
-import type { HowToPlayStep } from "@/app/components/HowToPlay";
+import { withPictures } from "@/app/components/HowToPlay";
+import { Fragment, type ReactNode } from "react";
 import { MONSTERS, type Monster } from "@/app/components/monsters/monsters";
+import type { Locale } from "@/app/i18n/locales";
 import MiniTile from "../components/MiniTile";
+import { ODD_TEXT } from "./text";
 
 const pip = MONSTERS[0];
 const threeEyedPip: Monster = { ...pip, eyes: 3 };
 
-const steps: ReadonlyArray<HowToPlayStep> = [
-  {
-    text: "Look at all the monsters. They're all the same… except one!",
-    picture: (
-      <>
-        <MiniTile monster={pip} />
-        <MiniTile monster={pip} />
-      </>
-    ),
-  },
-  {
-    text: "Find the one that's different and tap it.",
-    picture: (
-      <>
-        <MiniTile monster={pip} />
-        <MiniTile monster={threeEyedPip} />
-      </>
-    ),
-  },
-  {
-    text: "Spot 5 odd ones to go up a level and meet more monsters!",
-    picture: <MiniTile monster={threeEyedPip} ringed />,
-  },
+/** One picture per step, in the same order as the text's steps. */
+const pictures: ReadonlyArray<ReactNode> = [
+  <Fragment key="look">
+    <MiniTile monster={pip} />
+    <MiniTile monster={pip} />
+  </Fragment>,
+  <Fragment key="find">
+    <MiniTile monster={pip} />
+    <MiniTile monster={threeEyedPip} />
+  </Fragment>,
+  <MiniTile key="spot" monster={threeEyedPip} ringed />,
 ];
 
-export const ODD_HOW_TO_PLAY = Object.freeze({
-  steps,
-  tip: "check one thing at a time: colour, shape, eyes, the top of the head, mouths and spots.",
-});
+export function oddOneOutHowToPlay(locale: Locale) {
+  return withPictures(ODD_TEXT[locale].howToPlay, pictures);
+}
