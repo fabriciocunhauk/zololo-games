@@ -65,3 +65,24 @@ test("how to play can be reopened during a game", async ({ page }) => {
     page.getByRole("heading", { name: "How to play" })
   ).toBeVisible();
 });
+
+test("hard deals a bigger first board and the choice is remembered", async ({
+  page,
+}) => {
+  await page.goto("/memory-game");
+  const hard = page.getByRole("radio", { name: "Hard, ages 8 and up" });
+  await hard.click();
+  await expect(hard).toHaveAttribute("aria-checked", "true");
+  await page.getByRole("button", { name: "Start playing" }).click();
+
+  await expect(page.getByTestId("difficulty")).toHaveText("Hard · Ages 8+");
+  await expect(page.locator("[data-state]")).toHaveCount(12);
+
+  await page.getByRole("button", { name: "Change difficulty" }).click();
+  await expect(hard).toHaveAttribute("aria-checked", "true");
+
+  await page.reload();
+  await expect(
+    page.getByRole("radio", { name: "Hard, ages 8 and up" })
+  ).toHaveAttribute("aria-checked", "true");
+});

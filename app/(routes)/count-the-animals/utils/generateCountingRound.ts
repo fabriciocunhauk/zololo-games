@@ -1,6 +1,6 @@
 import { buildAnswerOptions } from "@/app/utils/buildAnswerOptions";
 import { randomInt } from "@/app/utils/randomInt";
-import { COUNTING_CONFIG } from "../constants/config";
+import { COUNTING_CONFIG, type CountRange } from "../constants/config";
 
 export type CountingRound<T> = {
   animal: T;
@@ -9,12 +9,11 @@ export type CountingRound<T> = {
   options: number[];
 };
 
-type Range = { min: number; max: number };
-
 /** One kind of animal per round, never the same animal twice in a row. */
 export function generateCountingRound<T>(
   animals: ReadonlyArray<T>,
-  range: Range,
+  range: CountRange,
+  maxOption: number,
   previous?: T
 ): CountingRound<T> {
   const choices =
@@ -25,7 +24,7 @@ export function generateCountingRound<T>(
     answer,
     count: COUNTING_CONFIG.optionCount,
     min: COUNTING_CONFIG.minOption,
-    max: COUNTING_CONFIG.maxOption,
+    max: maxOption,
     spread: COUNTING_CONFIG.optionSpread,
   }).sort((a, b) => a - b);
 

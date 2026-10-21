@@ -4,17 +4,17 @@ import { createShuffledDeck } from "./createShuffledDeck";
 const faces = Array.from({ length: 20 }, (_, i) => `face-${i}`);
 
 describe("createShuffledDeck", () => {
-  it("deals 2 pairs per level", () => {
-    expect(createShuffledDeck(1, faces)).toHaveLength(4);
-    expect(createShuffledDeck(3, faces)).toHaveLength(12);
+  it("deals two cards per pair", () => {
+    expect(createShuffledDeck(2, faces)).toHaveLength(4);
+    expect(createShuffledDeck(6, faces)).toHaveLength(12);
   });
 
   it("caps the deck at the faces available", () => {
-    expect(createShuffledDeck(15, faces)).toHaveLength(40);
+    expect(createShuffledDeck(30, faces)).toHaveLength(40);
   });
 
   it("contains exactly two cards per pair, sharing a face", () => {
-    const deck = createShuffledDeck(4, faces);
+    const deck = createShuffledDeck(8, faces);
     const byPair = new Map<number, string[]>();
     for (const card of deck) {
       byPair.set(card.pairId, [...(byPair.get(card.pairId) ?? []), card.face]);

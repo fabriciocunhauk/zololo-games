@@ -7,12 +7,12 @@ export type MemoryCardData<T> = {
   face: T;
 };
 
-/** Two cards per face; level n uses 2n faces, capped at the faces available. */
+/** Two cards per face, capped at the faces available. */
 export function createShuffledDeck<T>(
-  level: number,
+  pairs: number,
   faces: ReadonlyArray<T>
 ): MemoryCardData<T>[] {
-  const pairCount = Math.min(level * 2, faces.length);
+  const pairCount = Math.min(pairs, faces.length);
   const chosen = shuffle(faces).slice(0, pairCount);
   const deck = chosen
     .concat(chosen)

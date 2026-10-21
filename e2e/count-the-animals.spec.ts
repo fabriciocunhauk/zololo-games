@@ -80,3 +80,24 @@ test("five right answers move up to level 2", async ({ page }) => {
   await expect(page.getByRole("status")).toContainText("Level up!");
   await expect(page.getByTestId("level")).toHaveText("2");
 });
+
+test("hard asks for bigger counts and can go back to the intro", async ({
+  page,
+}) => {
+  await page.goto("/count-the-animals");
+  await page.getByRole("radio", { name: "Hard, ages 8 and up" }).click();
+  await page.getByRole("button", { name: "Start playing" }).click();
+
+  await expect(page.getByTestId("difficulty")).toHaveText("Hard · Ages 8+");
+  const total = await page.getByTestId("animal").count();
+  expect(total).toBeGreaterThanOrEqual(5);
+  expect(total).toBeLessThanOrEqual(10);
+
+  await page.getByRole("button", { name: "Change difficulty" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Count the Animals", level: 1 })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("radio", { name: "Hard, ages 8 and up" })
+  ).toHaveAttribute("aria-checked", "true");
+});

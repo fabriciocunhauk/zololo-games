@@ -1,11 +1,15 @@
 import type { CSSProperties, ReactNode } from "react";
+import type { Difficulty } from "@/app/constants/difficulty";
 import Container from "./Container";
+import DifficultyPicker from "./DifficultyPicker";
 
 type GameIntroProps = {
   hero: ReactNode;
   title: string;
   blurb: string;
   howToPlay: ReactNode;
+  difficulty: Difficulty;
+  onDifficultyChange: (difficulty: Difficulty) => void;
   onStart: () => void;
 };
 
@@ -13,12 +17,14 @@ const startStyle: CSSProperties & { "--tile": string } = {
   "--tile": "var(--color-sun)",
 };
 
-/** Shared start screen: hero art, title, how to play, and a big start button. */
+/** Shared start screen: hero art, title, how to play, difficulty, and a big start button. */
 export default function GameIntro({
   hero,
   title,
   blurb,
   howToPlay,
+  difficulty,
+  onDifficultyChange,
   onStart,
 }: GameIntroProps) {
   return (
@@ -39,6 +45,16 @@ export default function GameIntro({
         </div>
 
         {howToPlay}
+
+        <section className="flex w-full flex-col items-center gap-5">
+          <h2
+            id="difficulty-heading"
+            className="font-display text-2xl sm:text-3xl"
+          >
+            Who&apos;s playing?
+          </h2>
+          <DifficultyPicker value={difficulty} onChange={onDifficultyChange} />
+        </section>
 
         <button
           type="button"

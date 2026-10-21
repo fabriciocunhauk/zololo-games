@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { MONSTERS } from "./monsters";
 
 describe("MONSTERS", () => {
-  it("has enough monsters for the top level (2 pairs per level, 10 levels)", () => {
+  it("has enough monsters for the biggest boards", () => {
     expect(MONSTERS.length).toBeGreaterThanOrEqual(20);
   });
 
