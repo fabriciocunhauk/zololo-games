@@ -52,6 +52,14 @@
     box-shadow: 0 2px 0 var(--edge);
   }
 
+  /* Locked tiles keep focus (aria-disabled) but no longer lift or press. */
+  .toy-block[aria-disabled="true"],
+  .toy-block[aria-disabled="true"]:hover,
+  .toy-block[aria-disabled="true"]:active {
+    transform: none;
+    box-shadow: 0 var(--depth) 0 var(--edge);
+  }
+
   .toy-block:focus-visible {
     outline: 4px solid var(--color-ink);
     outline-offset: 6px;

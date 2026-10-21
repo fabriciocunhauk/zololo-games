@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Atkinson_Hyperlegible, Bagel_Fat_One } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import MotionProvider from "./components/MotionProvider";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -35,7 +36,7 @@ export default function RootLayout({
     >
       <body className="relative flex min-h-screen flex-col bg-paper font-sans text-ink antialiased">
         <Navbar />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Footer />
         <Analytics />
       </body>

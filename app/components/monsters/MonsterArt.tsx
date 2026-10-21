@@ -227,10 +227,11 @@ function Pattern({
       );
     case "spots":
       return (
-        <g className="fill-ink" opacity={0.15}>
-          <circle cx={x(-18)} cy={body.eyeY + 16} r={4} />
-          <circle cx={x(18)} cy={body.eyeY + 10} r={3} />
-          <circle cx={x(14)} cy={body.eyeY + 24} r={4.5} />
+        // Bold enough to spot at tile size; kept clear of a third eye.
+        <g className="fill-ink" opacity={0.35}>
+          <circle cx={x(-19)} cy={body.eyeY + 16} r={5} />
+          <circle cx={x(20)} cy={body.eyeY + 18} r={4} />
+          <circle cx={x(13)} cy={body.eyeY + 27} r={5} />
         </g>
       );
     case "cheeks":

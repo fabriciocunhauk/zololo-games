@@ -78,3 +78,47 @@ test("Hard uses a 0–30 line and is remembered after changing difficulty", asyn
     page.getByRole("radio", { name: "Hard, ages 8 and up" }),
   ).toBeChecked();
 });
+
+test("changing difficulty from the top level of Medium goes back to the intro", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await page.goto("/frog-jump");
+  await page.getByRole("radio", { name: /^Medium/ }).click();
+  await page.getByRole("button", { name: "Start playing" }).click();
+
+  // Ten right answers reach level 3, which Easy (2 levels) doesn't have.
+  for (let round = 1; round <= 10; round++) {
+    const { answer } = await readProblem(page);
+    await page.getByRole("button", { name: String(answer), exact: true }).click();
+    await expect(page.getByRole("status")).toContainText("Excellent!");
+    if (round < 10) {
+      await expect(page.getByRole("status")).toBeEmpty({ timeout: 5000 });
+    }
+  }
+  await expect(page.getByTestId("level")).toHaveText("3");
+
+  await page.getByRole("button", { name: "Change difficulty" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Frog Jump", level: 1 })
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Start playing" })).toBeVisible();
+});
+
+test("keyboard focus stays on the answers when a new round starts", async ({
+  page,
+}) => {
+  await page.goto("/frog-jump");
+  await page.getByRole("button", { name: "Start playing" }).click();
+  const { answer } = await readProblem(page);
+  const option = page.getByRole("button", { name: String(answer), exact: true });
+  await option.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("status")).toContainText("Excellent!");
+  await expect(page.getByRole("status")).toBeEmpty({ timeout: 5000 });
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.activeElement?.closest("[role=group]") !== null)
+    )
+    .toBe(true);
+});

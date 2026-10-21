@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
 import type { NavItem } from "@/app/constants/navItems";
@@ -14,7 +14,17 @@ export default function MobileMenu({
   items: ReadonlyArray<NavItem>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const openButton = useRef<HTMLButtonElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
   const close = () => setIsOpen(false);
+
+  // Move focus into the menu when it opens and back to the toggle when it closes.
+  useEffect(() => {
+    if (isOpen) closeButton.current?.focus();
+    else if (wasOpen.current) openButton.current?.focus();
+    wasOpen.current = isOpen;
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -28,6 +38,7 @@ export default function MobileMenu({
   return (
     <div className="2xl:hidden">
       <button
+        ref={openButton}
         type="button"
         aria-label="Open menu"
         aria-expanded={isOpen}
@@ -41,9 +52,13 @@ export default function MobileMenu({
       {isOpen && (
         <div
           id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu"
           className="fixed inset-0 z-30 flex flex-col overflow-y-auto bg-paper px-4 py-3"
         >
           <button
+            ref={closeButton}
             type="button"
             aria-label="Close menu"
             onClick={close}
