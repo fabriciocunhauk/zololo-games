@@ -1,32 +1,34 @@
-import { BUBBLE_POP_CONFIG } from "../constants/config";
 import { buildAnswerOptions } from "@/app/utils/buildAnswerOptions";
 import { randomInt } from "@/app/utils/randomInt";
+import type { BubblePopSettings, Operation } from "../constants/config";
 
-type MathProblem = {
+export type MathProblem = {
   text: string;
   answer: number;
+  /** One per bubble; always includes the answer. */
   options: number[];
 };
 
-/** A + or − problem with operands and result in range, plus answer options. */
-export function generateMathProblem(): MathProblem {
-  const { minOperand, maxOperand, minResult, maxResult } = BUBBLE_POP_CONFIG;
-  let a: number, b: number, op: "+" | "-", answer: number;
+/** A sum within the difficulty's ranges, never negative, plus answer options. */
+export function generateMathProblem(settings: BubblePopSettings): MathProblem {
+  const { operations, operands, results, bubbleCount, optionSpread } =
+    settings;
+  let a: number, b: number, op: Operation, answer: number;
 
   do {
-    a = randomInt(minOperand, maxOperand);
-    b = randomInt(minOperand, maxOperand);
-    op = Math.random() < 0.5 ? "+" : "-";
+    a = randomInt(operands.min, operands.max);
+    b = randomInt(operands.min, operands.max);
+    op = operations[randomInt(0, operations.length - 1)];
     if (op === "-" && a < b) [a, b] = [b, a];
     answer = op === "+" ? a + b : a - b;
-  } while (answer < minResult || answer > maxResult);
+  } while (answer < results.min || answer > results.max);
 
   const options = buildAnswerOptions({
     answer,
-    count: BUBBLE_POP_CONFIG.bubbleCount,
-    min: minResult,
-    max: maxResult,
-    spread: BUBBLE_POP_CONFIG.optionSpread,
+    count: bubbleCount,
+    min: Math.max(0, results.min),
+    max: results.max,
+    spread: optionSpread,
   });
 
   return { text: `${a} ${op} ${b} = ?`, answer, options };

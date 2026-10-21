@@ -2,7 +2,7 @@ import type { StaticImageData } from "next/image";
 import memoryImage from "@/public/images/memory-game/memory-cards.svg";
 import animalsImage from "@/public/images/animals/duck.png";
 import frogImage from "@/public/images/frog-jump/frog.png";
-import bubblesImage from "@/public/images/bubble-pop/bubbles.png";
+import bubblesImage from "@/public/images/bubble-pop/bubbles.svg";
 import oddOneOutImage from "@/public/images/odd-one-out/odd-one-out.svg";
 
 export type Game = {

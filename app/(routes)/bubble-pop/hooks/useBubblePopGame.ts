@@ -1,111 +1,168 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { Feedback } from "@/app/components/FeedbackMessage";
+import type { Difficulty } from "@/app/constants/difficulty";
+import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
-import { BUBBLE_POP_CONFIG } from "../constants/config";
+import { BUBBLE_POP_CONFIG, BUBBLE_POP_DIFFICULTY } from "../constants/config";
 import { createBubbles, type Bubble } from "../utils/createBubbles";
-import { generateMathProblem } from "../utils/generateMathProblem";
+import {
+  generateMathProblem,
+  type MathProblem,
+} from "../utils/generateMathProblem";
 import { getBubbleSize } from "../utils/getBubbleSize";
 
-export type GameState = "idle" | "countdown" | "playing";
+const { levelRiseScale } = BUBBLE_POP_CONFIG;
 
 export function useBubblePopGame() {
-  const [gameState, setGameState] = useState<GameState>("idle");
-  const [countdown, setCountdown] = useState<number>(
-    BUBBLE_POP_CONFIG.countdownFrom
-  );
-  const [problem, setProblem] = useState("");
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
+  /** 3, 2, 1, then 0 for "GO!"; null once play starts. */
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [roundId, setRoundId] = useState(0);
+  const [problem, setProblem] = useState<MathProblem | null>(null);
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const [poppedId, setPoppedId] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [score, setScore] = useState(0);
-  const [isProcessingClick, setIsProcessingClick] = useState(false);
-  const gameAreaRef = useRef<HTMLDivElement>(null);
+  /** Taps are ignored while bubbles set off, during feedback and the countdown. */
+  const [isLocked, setIsLocked] = useState(true);
+  const areaRef = useRef<HTMLDivElement>(null);
   const { schedule, clearAll } = useSafeTimeout();
 
-  const startRound = useCallback(() => {
-    const { fallbackAreaSize, bubbleStaggerMs, roundSettleMs } =
-      BUBBLE_POP_CONFIG;
-    setIsProcessingClick(true);
-    setFeedback(null);
+  const progress = useLevelProgress({
+    levelCount: levelRiseScale.length,
+    roundsPerLevel: BUBBLE_POP_CONFIG.roundsPerLevel,
+  });
 
-    const { text, answer, options } = generateMathProblem();
-    const area = gameAreaRef.current;
-    setProblem(text);
-    setBubbles(
-      createBubbles({
-        values: options,
-        answer,
-        areaWidth: area?.clientWidth || fallbackAreaSize,
-        areaHeight: area?.clientHeight || fallbackAreaSize,
-        bubbleSize: getBubbleSize(window.innerWidth),
-      })
-    );
-    schedule(
-      () => setIsProcessingClick(false),
-      options.length * bubbleStaggerMs + roundSettleMs
-    );
-  }, [schedule]);
+  const startRound = useCallback(
+    (forDifficulty: Difficulty, forLevel: number) => {
+      const { fallbackAreaSize, bubbleStaggerMs, roundSettleMs } =
+        BUBBLE_POP_CONFIG;
+      const settings = BUBBLE_POP_DIFFICULTY[forDifficulty];
+      const scale = levelRiseScale[forLevel];
+      const next = generateMathProblem(settings);
+      const area = areaRef.current;
 
-  useEffect(() => {
-    if (gameState !== "countdown") return;
-    if (countdown === 0) {
-      setGameState("playing");
-      return;
-    }
-    const id = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
-    return () => clearTimeout(id);
-  }, [gameState, countdown]);
-
-  // Runs after the play area has mounted, so the first round measures it.
-  useEffect(() => {
-    if (gameState === "playing") startRound();
-  }, [gameState, startRound]);
-
-  const reset = useCallback(
-    (nextState: GameState) => {
-      clearAll();
-      setGameState(nextState);
-      setCountdown(BUBBLE_POP_CONFIG.countdownFrom);
-      setScore(0);
-      setProblem("");
-      setBubbles([]);
+      setRoundId((id) => id + 1);
+      setProblem(next);
       setFeedback(null);
-      setIsProcessingClick(false);
+      setPoppedId(null);
+      setIsLocked(true);
+      setBubbles(
+        createBubbles({
+          values: next.options,
+          answer: next.answer,
+          areaWidth: area?.clientWidth || fallbackAreaSize,
+          areaHeight: area?.clientHeight || fallbackAreaSize,
+          bubbleSize: getBubbleSize(window.innerWidth),
+          riseSeconds: {
+            min: settings.riseSeconds.min * scale,
+            max: settings.riseSeconds.max * scale,
+          },
+          staggerSeconds: bubbleStaggerMs / 1000,
+        })
+      );
+      schedule(
+        () => setIsLocked(false),
+        next.options.length * bubbleStaggerMs + roundSettleMs
+      );
     },
-    [clearAll]
+    [schedule]
   );
 
-  const startGame = useCallback(() => reset("countdown"), [reset]);
-  const resetGame = useCallback(() => reset("idle"), [reset]);
+  /** Clears the board and counts 3-2-1-GO, then starts at level 1. */
+  const countIn = useCallback(
+    (forDifficulty: Difficulty) => {
+      const { countdownFrom, countdownStepMs, goHoldMs } = BUBBLE_POP_CONFIG;
+      clearAll();
+      progress.reset();
+      setScore(0);
+      setProblem(null);
+      setBubbles([]);
+      setFeedback(null);
+      setIsLocked(true);
+      setCountdown(countdownFrom);
+      for (let n = countdownFrom - 1; n >= 0; n--) {
+        schedule(() => setCountdown(n), (countdownFrom - n) * countdownStepMs);
+      }
+      schedule(() => {
+        setCountdown(null);
+        startRound(forDifficulty, 0);
+      }, countdownFrom * countdownStepMs + goHoldMs);
+    },
+    [clearAll, progress, schedule, startRound]
+  );
+
+  const start = useCallback(
+    (chosen: Difficulty) => {
+      setDifficulty(chosen);
+      countIn(chosen);
+    },
+    [countIn]
+  );
+
+  const restart = useCallback(() => {
+    if (difficulty) countIn(difficulty);
+  }, [difficulty, countIn]);
+
+  const quit = useCallback(() => {
+    clearAll();
+    setDifficulty(null);
+    setCountdown(null);
+    setProblem(null);
+    setBubbles([]);
+    setFeedback(null);
+  }, [clearAll]);
 
   const popBubble = useCallback(
     (bubble: Bubble) => {
-      if (isProcessingClick || gameState !== "playing") return;
-
-      setIsProcessingClick(true);
-      if (bubble.isCorrect) {
-        setFeedback({ tone: "success", text: "🎉 Correct!" });
-        setScore((prev) => prev + BUBBLE_POP_CONFIG.points);
-      } else {
-        setFeedback({ tone: "error", text: "Oops! Try again." });
-      }
+      if (isLocked || !difficulty) return;
+      setIsLocked(true);
+      setPoppedId(bubble.id);
       setBubbles([]);
-      schedule(startRound, BUBBLE_POP_CONFIG.nextRoundDelayMs);
+
+      if (bubble.isCorrect) {
+        const next = progress.recordCorrect();
+        setScore((prev) => prev + BUBBLE_POP_CONFIG.points);
+        setFeedback({
+          tone: "success",
+          text: next.levelUp
+            ? "🎉 Correct! Level up: the bubbles float faster now!"
+            : "🎉 Correct!",
+        });
+        schedule(
+          () => startRound(difficulty, next.level),
+          BUBBLE_POP_CONFIG.nextRoundDelayMs
+        );
+        return;
+      }
+
+      setFeedback({ tone: "error", text: "Oops! Try again." });
+      schedule(
+        () => startRound(difficulty, progress.level),
+        BUBBLE_POP_CONFIG.nextRoundDelayMs
+      );
     },
-    [isProcessingClick, gameState, schedule, startRound]
+    [isLocked, difficulty, progress, schedule, startRound]
   );
 
   return {
-    gameState,
+    difficulty,
     countdown,
-    problem,
-    bubbles,
-    feedback,
+    level: progress.level + 1,
+    stars: progress.stars,
+    roundsPerLevel: progress.roundsPerLevel,
     score,
-    isProcessingClick,
-    gameAreaRef,
-    startGame,
-    resetGame,
+    roundId,
+    problem: problem?.text ?? null,
+    bubbles,
+    poppedId,
+    feedback,
+    isLocked,
+    areaRef,
+    start,
+    restart,
+    quit,
     popBubble,
   };
 }

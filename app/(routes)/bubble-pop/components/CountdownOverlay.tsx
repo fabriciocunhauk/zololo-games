@@ -1,27 +1,52 @@
 "use client";
-import { AnimatePresence, motion } from "framer-motion";
+import type { CSSProperties } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
-export default function CountdownOverlay({ countdown }: { countdown: number }) {
+const TILES = [
+  "var(--color-sun)",
+  "var(--color-leaf)",
+  "var(--color-grape)",
+  "var(--color-sky)",
+];
+
+function tileStyle(countdown: number) {
+  const style: CSSProperties & { "--tile": string; "--depth": string } = {
+    "--tile": TILES[countdown % TILES.length],
+    "--depth": "14px",
+  };
+  return style;
+}
+
+/** 3-2-1-GO on a big toy block over a paper scrim. */
+export default function CountdownOverlay({
+  countdown,
+}: {
+  countdown: number | null;
+}) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <AnimatePresence>
-      {countdown >= 0 && (
+      {countdown !== null && (
         <motion.div
-          key="countdown-overlay"
+          key="countdown"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-pink-300/70 flex items-center justify-center z-50"
+          transition={{ duration: reduceMotion ? 0 : 0.2 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-paper/85"
         >
-          <motion.div
+          <motion.p
             key={countdown}
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 1.5, opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="font-display text-white text-7xl xl:text-9xl drop-shadow-lg"
+            aria-live="assertive"
+            initial={reduceMotion ? false : { scale: 0.4, rotate: -10, opacity: 0 }}
+            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 420, damping: 16 }}
+            style={tileStyle(countdown)}
+            className="toy-block flex h-40 min-w-40 items-center justify-center px-8 font-display text-8xl leading-none sm:h-56 sm:min-w-56 sm:text-9xl"
           >
             {countdown > 0 ? countdown : "GO!"}
-          </motion.div>
+          </motion.p>
         </motion.div>
       )}
     </AnimatePresence>
