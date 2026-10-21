@@ -5,6 +5,8 @@ import { MONSTERS, type Monster } from "@/app/components/monsters/monsters";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { playSound } from "@/app/utils/soundPlayer";
+import { resultSound } from "@/app/utils/sounds";
 import { randomInt } from "@/app/utils/randomInt";
 import { PATTERN_CONFIG, PATTERN_DIFFICULTY } from "../constants/config";
 import { revealText, rightText } from "../utils/feedbackText";
@@ -73,6 +75,7 @@ export function usePatternTrainGame() {
       if (choice.name === round.answer.name) {
         setSelected(choice);
         const next = progress.recordCorrect();
+        playSound(resultSound(next));
         setFeedback({ tone: "success", text: rightText(next) });
         schedule(
           () => startRound(difficulty, next.level),
@@ -81,6 +84,7 @@ export function usePatternTrainGame() {
         return;
       }
 
+      playSound("wrong");
       if (tried === null) {
         setTried(choice.name);
         setFeedback({

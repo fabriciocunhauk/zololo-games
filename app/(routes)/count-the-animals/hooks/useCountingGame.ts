@@ -4,6 +4,8 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { playSound } from "@/app/utils/soundPlayer";
+import { resultSound } from "@/app/utils/sounds";
 import { ANIMALS, type Animal } from "../constants/animals";
 import { COUNTING_CONFIG, COUNTING_DIFFICULTY } from "../constants/config";
 import { countLabel } from "../utils/countLabel";
@@ -59,6 +61,7 @@ export function useCountingGame() {
   const countAnimal = useCallback(
     (position: number) => {
       if (selected !== null || counted.includes(position)) return;
+      playSound("tap");
       setCounted([...counted, position]);
     },
     [selected, counted]
@@ -76,6 +79,7 @@ export function useCountingGame() {
 
       if (choice === round.answer) {
         const next = progress.recordCorrect();
+        playSound(resultSound(next));
         // On the last level the star row just refills.
         const extra = next.levelUp
           ? ` Level up! Now count up to ${settings.levels[next.level].max}.`
@@ -94,11 +98,15 @@ export function useCountingGame() {
       // Wrong: count along together, then say the answer.
       const { revealLeadMs, revealStepMs, revealHoldMs } = COUNTING_CONFIG;
       const lead = "Not quite! Let's count them together.";
+      playSound("wrong");
       setCounted([]);
       setFeedback({ tone: "error", text: lead });
       for (let i = 1; i <= round.answer; i++) {
         schedule(
-          () => setCounted(Array.from({ length: i }, (_, idx) => idx)),
+          () => {
+            playSound("tap");
+            setCounted(Array.from({ length: i }, (_, idx) => idx));
+          },
           revealLeadMs + revealStepMs * i
         );
       }

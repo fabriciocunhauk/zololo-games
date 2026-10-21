@@ -4,6 +4,8 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { playSound } from "@/app/utils/soundPlayer";
+import { resultSound } from "@/app/utils/sounds";
 import { LETTER_CONFIG, LETTER_DIFFICULTY } from "../constants/config";
 import { PICTURE_WORDS } from "../constants/words";
 import { checkSpellingTap } from "../utils/checkSpelling";
@@ -91,11 +93,13 @@ export function useLetterSoundsGame() {
       if (choice === round.answer) {
         const next = progress.recordCorrect();
         const extra = cheer(next.levelUp, next.stars === 0);
+        playSound(resultSound(next));
         setFeedback({ tone: "success", text: `🎉 Yes! ${sentence}!${extra}` });
         schedule(() => startRound(difficulty, word), nextRoundDelayMs);
         return;
       }
 
+      playSound("wrong");
       setFeedback({ tone: "error", text: TRY_AGAIN });
       schedule(() => {
         setFeedback({ tone: "info", text: `${sentence}.` });
@@ -117,6 +121,7 @@ export function useLetterSoundsGame() {
       const result = checkSpellingTap(word, placed, letter);
 
       if (result === "wrong") {
+        playSound("wrong");
         setMistakes((count) => count + 1);
         setShake((prev) => ({ tile, nonce: (prev?.nonce ?? 0) + 1 }));
         setFeedback({ tone: "error", text: TRY_AGAIN });
@@ -126,6 +131,7 @@ export function useLetterSoundsGame() {
       setPlaced([...placed, letter]);
       setUsedTiles([...usedTiles, tile]);
       if (result === "placed") {
+        playSound("tap");
         setFeedback(null);
         return;
       }
@@ -134,11 +140,13 @@ export function useLetterSoundsGame() {
       if (mistakes === 0) {
         const next = progress.recordCorrect();
         const extra = cheer(next.levelUp, next.stars === 0);
+        playSound(resultSound(next));
         setFeedback({
           tone: "success",
           text: `🎉 Yes! You spelled ${word}!${extra}`,
         });
       } else {
+        playSound("correct");
         setFeedback({
           tone: "info",
           text: `You spelled ${word}! No slips next time for a star.`,

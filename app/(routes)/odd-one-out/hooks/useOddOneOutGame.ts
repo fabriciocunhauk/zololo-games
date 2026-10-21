@@ -5,6 +5,8 @@ import { MONSTERS } from "@/app/components/monsters/monsters";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { playSound } from "@/app/utils/soundPlayer";
+import { resultSound } from "@/app/utils/sounds";
 import { ODD_CONFIG, ODD_DIFFICULTY } from "../constants/config";
 import { makeOddOneOut, type OddOneOutRound } from "../utils/makeOddOneOut";
 import { spottedText } from "../utils/spottedText";
@@ -70,6 +72,7 @@ export function useOddOneOutGame() {
 
       if (position === round.oddIndex) {
         const next = progress.recordCorrect();
+        playSound(resultSound(next));
         setOutcome("spotted");
         setFeedback({
           tone: "success",
@@ -86,6 +89,7 @@ export function useOddOneOutGame() {
         return;
       }
 
+      playSound("wrong");
       const wrong = [...wrongTaps, position];
       setWrongTaps(wrong);
       if (wrong.length < ODD_CONFIG.maxWrongTaps) {

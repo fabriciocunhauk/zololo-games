@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { difficultyOption, type Difficulty } from "@/app/constants/difficulty";
 import HeaderButton from "./HeaderButton";
 import ScrollToTop from "./ScrollToTop";
+import SoundToggle from "./SoundToggle";
 
 type GameHeaderProps = {
   title: string;
@@ -49,6 +50,7 @@ export default function GameHeader({
           {meter}
           {stats && <dl className="flex gap-2 sm:gap-3">{stats}</dl>}
           {actions}
+          <SoundToggle />
           <HeaderButton tone="bg-white" onClick={onChangeDifficulty}>
             Change difficulty
           </HeaderButton>

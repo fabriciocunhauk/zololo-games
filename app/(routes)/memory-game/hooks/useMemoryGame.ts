@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { MONSTERS, type Monster } from "@/app/components/monsters/monsters";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { playSound } from "@/app/utils/soundPlayer";
 import { MEMORY_CONFIG, MEMORY_DIFFICULTY } from "../constants/config";
 import {
   createShuffledDeck,
@@ -57,6 +58,7 @@ export function useMemoryGame() {
     if (gameWon || deck.length === 0 || matched.length !== deck.length) return;
     if (!difficulty) return;
     setGameWon(true);
+    playSound("win");
     schedule(() => {
       if (level >= maxLevel) dealBoard(difficulty, level);
       else setLevel(level + 1);
@@ -70,6 +72,7 @@ export function useMemoryGame() {
   const flipCard = useCallback(
     (idx: number) => {
       if (isBusy || flipped.includes(idx) || matched.includes(idx)) return;
+      playSound("flip");
       if (flipped.length === 0) {
         setFlipped([idx]);
         return;
@@ -82,6 +85,7 @@ export function useMemoryGame() {
 
       if (deck[firstIdx].pairId === deck[idx].pairId) {
         announce(MATCH);
+        playSound("correct");
         schedule(() => {
           setMatched((prev) => [...prev, firstIdx, idx]);
           setFlipped([]);
@@ -89,6 +93,7 @@ export function useMemoryGame() {
         }, MEMORY_CONFIG.matchDelayMs);
       } else {
         announce(MISMATCH);
+        playSound("wrong");
         schedule(() => {
           setFlipped([]);
           setIsBusy(false);

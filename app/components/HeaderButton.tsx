@@ -6,6 +6,8 @@ type HeaderButtonProps = {
   children: ReactNode;
   /** Tailwind background class. */
   tone?: string;
+  /** Makes it a toggle button. */
+  pressed?: boolean;
 };
 
 /** Chunky ink-edged button for game headers (restart, change difficulty). */
@@ -13,11 +15,13 @@ export default function HeaderButton({
   onClick,
   children,
   tone = "bg-pink-primary",
+  pressed,
 }: HeaderButtonProps) {
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={pressed}
       className={classNames(
         "min-h-11 rounded-xl border-[3px] border-ink px-3 py-2 text-sm font-bold sm:px-4 sm:py-3 sm:text-base shadow-[0_4px_0_var(--color-ink)] transition-transform active:translate-y-[3px] active:shadow-[0_1px_0_var(--color-ink)] motion-reduce:transition-none motion-reduce:active:translate-y-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink focus-visible:ring-offset-2",
         tone

@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Difficulty } from "@/app/constants/difficulty";
+import { playSound } from "@/app/utils/soundPlayer";
 import Container from "./Container";
 import DifficultyPicker from "./DifficultyPicker";
 import ScrollToTop from "./ScrollToTop";
@@ -60,7 +61,10 @@ export default function GameIntro({
 
         <button
           type="button"
-          onClick={onStart}
+          onClick={() => {
+            playSound("tap");
+            onStart();
+          }}
           style={startStyle}
           className="toy-block px-10 py-4 font-display text-2xl"
         >

@@ -122,3 +122,19 @@ test("keyboard focus stays on the answers when a new round starts", async ({
     )
     .toBe(true);
 });
+
+test("the sound toggle mutes and is remembered after a reload", async ({
+  page,
+}) => {
+  await page.goto("/frog-jump");
+  await page.getByRole("button", { name: "Start playing" }).click();
+
+  const sound = page.getByRole("button", { name: "Sound" });
+  await expect(sound).toHaveAttribute("aria-pressed", "true");
+  await sound.click();
+  await expect(sound).toHaveAttribute("aria-pressed", "false");
+
+  await page.reload();
+  await page.getByRole("button", { name: "Start playing" }).click();
+  await expect(sound).toHaveAttribute("aria-pressed", "false");
+});

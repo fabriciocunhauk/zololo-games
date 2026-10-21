@@ -4,6 +4,7 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { playSound } from "@/app/utils/soundPlayer";
 import type { Bin } from "../constants/bins";
 import { SHAPE_CONFIG, SHAPE_DIFFICULTY } from "../constants/config";
 import type { Shape } from "../constants/shapes";
@@ -84,6 +85,8 @@ export function useShapeSorterGame() {
   const finishRound = useCallback(
     (forDifficulty: Difficulty) => {
       const next = progress.recordCorrect();
+      // A whole tray sorted earns the arpeggio; a new level the fanfare.
+      playSound(next.levelUp ? "win" : "levelUp");
       setPhase("complete");
       setFeedback({ tone: "success", text: roundCompleteText(next) });
       schedule(
@@ -102,6 +105,7 @@ export function useShapeSorterGame() {
       if (!shape || !bin) return;
 
       if (binFor(shape, settings.sortBy) !== binId) {
+        playSound("wrong");
         setFeedback({ tone: "error", text: "Not that one! Try another bin." });
         setShake((prev) => ({ binId, nonce: (prev?.nonce ?? 0) + 1 }));
         return;
@@ -113,6 +117,7 @@ export function useShapeSorterGame() {
         [binId]: { shape, key: shapeKey(round.id, index) },
       }));
       setPhase("dropping");
+      playSound("correct");
       setFeedback({ tone: "success", text: `Yes! ${bin.praise}` });
 
       const isLast = index === round.tray.length - 1;

@@ -4,6 +4,8 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { playSound } from "@/app/utils/soundPlayer";
+import { resultSound } from "@/app/utils/sounds";
 import { BUBBLE_POP_CONFIG, BUBBLE_POP_DIFFICULTY } from "../constants/config";
 import { createBubbles, type Bubble } from "../utils/createBubbles";
 import {
@@ -83,8 +85,12 @@ export function useBubblePopGame() {
       setFeedback(null);
       lock(true);
       setCountdown(countdownFrom);
+      playSound("tick");
       for (let n = countdownFrom - 1; n >= 0; n--) {
-        schedule(() => setCountdown(n), (countdownFrom - n) * countdownStepMs);
+        schedule(() => {
+          setCountdown(n);
+          playSound(n === 0 ? "go" : "tick");
+        }, (countdownFrom - n) * countdownStepMs);
       }
       schedule(() => {
         setCountdown(null);
@@ -125,6 +131,8 @@ export function useBubblePopGame() {
 
       if (bubble.isCorrect) {
         const next = progress.recordCorrect();
+        playSound("pop");
+        playSound(resultSound(next));
         setScore((prev) => prev + BUBBLE_POP_CONFIG.points);
         setFeedback({
           tone: "success",
@@ -142,6 +150,7 @@ export function useBubblePopGame() {
       }
 
       // Wrong: say the answer before the next sum floats in.
+      playSound("wrong");
       setFeedback({
         tone: "error",
         text: `Not quite! ${solveText(problem)}.`,

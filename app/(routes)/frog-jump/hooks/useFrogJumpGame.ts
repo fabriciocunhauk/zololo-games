@@ -4,6 +4,8 @@ import type { Feedback } from "@/app/components/FeedbackMessage";
 import type { Difficulty } from "@/app/constants/difficulty";
 import { useLevelProgress } from "@/app/hooks/useLevelProgress";
 import { useSafeTimeout } from "@/app/hooks/useSafeTimeout";
+import { playSound } from "@/app/utils/soundPlayer";
+import { resultSound } from "@/app/utils/sounds";
 import { FROG_JUMP_CONFIG, FROG_JUMP_DIFFICULTY } from "../constants/config";
 import {
   generateJumpProblem,
@@ -58,6 +60,7 @@ export function useFrogJumpGame() {
 
       if (choice === problem.answer) {
         const next = progress.recordCorrect();
+        playSound(resultSound(next));
         const text = next.levelUp
           ? `🎉 Excellent! Level up! Now jumps go up to ${settings.levels[next.level].max}.`
           : next.stars === 0
@@ -72,6 +75,7 @@ export function useFrogJumpGame() {
       }
 
       // Wrong: the frog still hops, to the right pad, and we say where.
+      playSound("wrong");
       const { start: from, operation, jump, answer: landing } = problem;
       const sign = operation === "+" ? "+" : "−";
       setFeedback({
