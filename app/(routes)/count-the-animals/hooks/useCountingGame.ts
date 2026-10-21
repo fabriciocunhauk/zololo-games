@@ -76,9 +76,13 @@ export function useCountingGame() {
 
       if (choice === round.answer) {
         const next = progress.recordCorrect();
-        const text = next.levelUp
-          ? `Yes! ${label}! Level up! Now count up to ${settings.levels[next.level].max}.`
-          : `Yes! ${label}!`;
+        // On the last level the star row just refills.
+        const extra = next.levelUp
+          ? ` Level up! Now count up to ${settings.levels[next.level].max}.`
+          : next.stars === 0
+            ? " Another row of stars!"
+            : "";
+        const text = `Yes! ${label}!${extra}`;
         setFeedback({ tone: "success", text: `🎉 ${text}` });
         schedule(
           () => startRound(difficulty, next.level, round.animal),

@@ -54,6 +54,7 @@ export default function CountingGame() {
               caption={`up to ${game.levelMax}`}
             />
           }
+          howToPlay={<HowToPlay {...COUNTING_HOW_TO_PLAY} />}
         />
         <CountingQuestion
           animal={round.animal}
